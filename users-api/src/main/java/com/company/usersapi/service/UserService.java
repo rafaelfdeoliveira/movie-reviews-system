@@ -54,6 +54,12 @@ public class UserService {
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
+    public boolean isTokenValid(String token) {
+        final String userName = jwtTokenUtil.getUsernameFromToken(token);
+        final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(userName);
+        return jwtTokenUtil.validateToken(token, userDetails);
+    }
+
     private void authenticate(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
