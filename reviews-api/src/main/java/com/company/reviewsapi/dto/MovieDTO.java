@@ -2,10 +2,8 @@ package com.company.reviewsapi.dto;
 
 import com.company.reviewsapi.model.Commentary;
 import com.company.reviewsapi.model.Grade;
-import lombok.NoArgsConstructor;
 import java.util.List;
 
-@NoArgsConstructor
 public class MovieDTO {
     public String imdbID;
     public String Title;
@@ -35,10 +33,6 @@ public class MovieDTO {
 
     public List<Commentary> commentaries;
     public List<Grade> grades;
-
-    public MovieDTO(String Response) {
-        this.Response = Response;
-    }
 
     public static class Rating {
         public String Source;

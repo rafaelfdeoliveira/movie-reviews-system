@@ -16,7 +16,7 @@ public class UserDTO {
     @NotNull
     private String password;
     private Boolean enabled;
-    private int points;
+    private Integer points;
     private List<String> roles;
 
     public static UserDTO convert(User user) {

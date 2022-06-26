@@ -24,7 +24,7 @@ public class User {
     private Boolean enabled;
 
     @Column(name = "points")
-    private int points;
+    private Integer points;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Authority> authorities = new ArrayList<>();
