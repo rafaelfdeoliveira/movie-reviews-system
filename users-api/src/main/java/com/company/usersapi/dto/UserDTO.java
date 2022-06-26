@@ -16,16 +16,15 @@ public class UserDTO {
     @NotNull
     private String password;
     private Boolean enabled;
+    private int points;
     private List<String> roles;
 
     public static UserDTO convert(User user) {
         UserDTO dto = new UserDTO();
         dto.setEnabled(user.getEnabled());
         dto.setUserName(user.getUserName());
-        dto.setRoles(user.getAuthorities()
-                .stream()
-                .map((authority -> authority.getAuthorityKey().getAuthority()))
-                .collect(Collectors.toList()));
+        dto.setPoints(user.getPoints());
+        dto.setRoles(user.getRoles());
         return dto;
     }
 }

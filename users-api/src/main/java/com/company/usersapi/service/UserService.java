@@ -39,6 +39,7 @@ public class UserService {
         if (userDTO.getPassword() == null) throw new ResponseStatusException(HttpStatus.PARTIAL_CONTENT, "A password must be provided");
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        userDTO.setPoints(0);
         User user = User.convert(userDTO);
         User userDB = userRepository.save(user);
 
@@ -52,12 +53,6 @@ public class UserService {
         final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getUserName());
         final String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
-    }
-
-    public boolean isTokenValid(String token) {
-        final String userName = jwtTokenUtil.getUsernameFromToken(token);
-        final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(userName);
-        return jwtTokenUtil.validateToken(token, userDetails);
     }
 
     private void authenticate(String username, String password) {

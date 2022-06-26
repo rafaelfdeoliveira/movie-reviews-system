@@ -27,9 +27,4 @@ public class UserController {
     public ResponseEntity<JwtResponse> getAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
         return userService.getAuthenticationToken(authenticationRequest);
     }
-
-    @GetMapping("/authenticate")
-    public boolean isAuthenticated(@RequestBody String token) {
-        return userService.isTokenValid(token);
-    }
 }

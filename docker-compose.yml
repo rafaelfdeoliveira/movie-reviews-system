@@ -3,12 +3,9 @@ services:
   reviews-api:
     build:
       context: ./reviews-api
-    ports:
-      -
     networks:
       - movie-reviews-api
     depends_on:
-      - users-api
       - postgresDB
     environment:
       - spring.datasource.url=jdbc:postgresql://postgresDB/movie-reviews-system
@@ -16,12 +13,16 @@ services:
   users-api:
     build:
       context: ./users-api
+    ports:
+      - "8081:8382"
     networks:
       - movie-reviews-api
     depends_on:
       - postgresDB
+      - reviews-api
     environment:
       - spring.datasource.url=jdbc:postgresql://postgresDB/movie-reviews-system
+      - reviewsApiUrl=http://reviews-api:8384
 
   postgresDB:
     image:  postgres

@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
 public class JwtUserDetailsService implements UserDetailsService {
@@ -19,6 +21,6 @@ public class JwtUserDetailsService implements UserDetailsService {
         User user = userRepository.findById(userName).orElse(null);
         if (user == null) throw new UsernameNotFoundException("User not found with userName: " + userName);
 
-        return new org.springframework.security.core.userdetails.User(userName, user.getPassword(), user.getAuthorities());
+        return new org.springframework.security.core.userdetails.User(userName, user.getPassword(), new ArrayList<>());
     }
 }
