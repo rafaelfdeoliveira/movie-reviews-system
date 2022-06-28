@@ -1,6 +1,7 @@
 package com.company.usersapi.dto;
 
 import java.util.List;
+import java.util.Set;
 
 public class MovieDTO {
     public String imdbID;
@@ -33,17 +34,27 @@ public class MovieDTO {
     public List<Grade> grades;
 
     public static class Commentary {
+        public Long id;
         public String userName;
         public String text;
-        public List<CommentaryReply> commentaryReplies;
+        public Set<CommentaryReply> commentaryReplies;
+        public Set<CommentaryEvaluation> commentaryEvaluations;
     }
 
     public static class CommentaryReply {
+        public Long id;
         public String userName;
         public String text;
     }
 
+    public static class CommentaryEvaluation {
+        public Long id;
+        public String userName;
+        public Boolean liked;
+    }
+
     public static class Grade {
+        public Long id;
         public String userName;
         public Float grade;
     }

@@ -4,19 +4,18 @@ import com.company.usersapi.model.User;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
 public class UserDTO {
-    @NotNull
+    @NotEmpty
     private String userName;
-    @NotNull
+    @NotEmpty
     private String password;
     private Boolean enabled;
-    private Integer points;
+    private int points;
     private List<String> roles;
 
     public static UserDTO convert(User user) {

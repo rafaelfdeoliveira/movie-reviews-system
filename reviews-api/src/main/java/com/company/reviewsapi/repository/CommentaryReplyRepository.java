@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CommentaryReplyRepository extends JpaRepository<CommentaryReply, String>, JpaSpecificationExecutor<CommentaryReply> {
+public interface CommentaryReplyRepository extends JpaRepository<CommentaryReply, Long>, JpaSpecificationExecutor<CommentaryReply> {
 
 }

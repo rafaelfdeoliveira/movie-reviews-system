@@ -1,7 +1,10 @@
 package com.company.reviewsapi.controller;
 
-import com.company.reviewsapi.dto.MovieDTO;
-import com.company.reviewsapi.dto.MovieSearchDTO;
+import com.company.reviewsapi.dto.CommentaryEvaluationDTO;
+import com.company.reviewsapi.dto.CommentaryReplyDTO;
+import com.company.reviewsapi.model.Commentary;
+import com.company.reviewsapi.model.CommentaryEvaluation;
+import com.company.reviewsapi.model.CommentaryReply;
 import com.company.reviewsapi.model.Grade;
 import com.company.reviewsapi.service.ReviewsService;
 import lombok.RequiredArgsConstructor;
@@ -13,29 +16,23 @@ import reactor.core.publisher.Mono;
 public class ReviewsController {
     private final ReviewsService reviewsService;
 
-    @GetMapping("/movie")
-    public Mono<MovieDTO> getMovieByTitle(
-            @RequestParam String title,
-            @RequestParam(required = false) String year
-    ) {
-        return reviewsService.getMovieByTitle(title, year);
-    }
-
-    @GetMapping("/movie/id")
-    public Mono<MovieDTO> getMovieById(@RequestParam String movieId) {
-        return reviewsService.getMovieById(movieId);
-    }
-
-    @GetMapping("/movie/search")
-    public Mono<MovieSearchDTO> getMovieSearch(
-            @RequestParam String title,
-            @RequestParam(required = false) String year
-    ){
-        return reviewsService.getMovieSearch(title, year);
-    }
-
     @PostMapping("/grade")
     public Mono<Grade> registerMovieGrade(@RequestBody Grade grade) {
         return reviewsService.registerMovieGrade(grade);
+    }
+
+    @PostMapping("/commentary")
+    public Mono<Commentary> registerMovieCommentary(@RequestBody Commentary commentary) {
+        return reviewsService.registerMovieCommentary(commentary);
+    }
+
+    @PostMapping("/commentary/reply")
+    public Mono<CommentaryReply> registerCommentaryReply(@RequestBody CommentaryReplyDTO commentaryReplyDTO) {
+        return reviewsService.registerCommentaryReply(commentaryReplyDTO);
+    }
+
+    @PostMapping("/commentary/evaluation")
+    public Mono<CommentaryEvaluation> registerCommentaryEvaluation(@RequestBody CommentaryEvaluationDTO commentaryEvaluationDTO) {
+        return reviewsService.registerCommentaryEvaluation(commentaryEvaluationDTO);
     }
 }

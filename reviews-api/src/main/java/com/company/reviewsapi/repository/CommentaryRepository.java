@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CommentaryRepository extends JpaRepository<Commentary, String>, JpaSpecificationExecutor<Commentary> {
+public interface CommentaryRepository extends JpaRepository<Commentary, Long>, JpaSpecificationExecutor<Commentary> {
     List<Commentary> findByMovieId(String movieId);
 }

@@ -27,4 +27,9 @@ public class UserController {
     public ResponseEntity<JwtResponse> getAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
         return userService.getAuthenticationToken(authenticationRequest);
     }
+
+    @GetMapping("/user")
+    public UserDTO getLoggedUser(@RequestHeader(name = "Authorization") String accessToken) {
+        return userService.getLoggedUser(accessToken);
+    }
 }

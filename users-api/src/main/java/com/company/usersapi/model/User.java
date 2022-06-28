@@ -3,6 +3,7 @@ package com.company.usersapi.model;
 import com.company.usersapi.dto.UserDTO;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -24,9 +25,9 @@ public class User {
     private Boolean enabled;
 
     @Column(name = "points")
-    private Integer points;
+    private int points;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Authority> authorities = new ArrayList<>();
 
     public static User convert(UserDTO dto) {

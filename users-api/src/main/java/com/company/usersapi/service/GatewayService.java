@@ -1,9 +1,7 @@
 package com.company.usersapi.service;
 
 import com.company.usersapi.config.JwtTokenUtil;
-import com.company.usersapi.dto.GradeDTO;
-import com.company.usersapi.dto.MovieDTO;
-import com.company.usersapi.dto.MovieSearchDTO;
+import com.company.usersapi.dto.*;
 import com.company.usersapi.model.Authority;
 import com.company.usersapi.model.User;
 import com.company.usersapi.repository.AuthorityRepository;
@@ -31,7 +29,7 @@ public class GatewayService {
         return reviewsApiClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/movie")
+                        .path("/movie/title")
                         .queryParam("title", title)
                         .queryParam("year", year)
                         .build())
@@ -60,13 +58,14 @@ public class GatewayService {
                 .map(this::checkIfMovieWasFound);
     }
 
-    public Mono<MovieSearchDTO> getMovieSearch(String title, String year) {
+    public Mono<MovieSearchDTO> getMovieSearch(String title, String year, Integer page) {
         return reviewsApiClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("movie/search")
                         .queryParam("title", title)
                         .queryParam("year", year)
+                        .queryParam("page", page)
                         .build())
                 .retrieve()
                 .bodyToMono(MovieSearchDTO.class)
@@ -96,6 +95,64 @@ public class GatewayService {
                 });
     }
 
+    public Mono<CommentaryDTO> registerMovieCommentary(String accessToken, CommentaryDTO commentaryDTO) {
+        String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
+        commentaryDTO.setUserName(userName);
+        return reviewsApiClient
+                .post()
+                .uri("/commentary")
+                .body(BodyInserters.fromValue(commentaryDTO))
+                .retrieve()
+                .bodyToMono(CommentaryDTO.class)
+                .publishOn(Schedulers.boundedElastic())
+                .onErrorMap(err -> {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid MovieId");
+                })
+                .map(commentary -> {
+                    this.giveUserOnePoint(commentary.getUserName());
+                    return commentary;
+                });
+
+    }
+
+    public Mono<CommentaryReplyDTO> registerCommentaryReply(String accessToken, CommentaryReplyDTO commentaryReplyDTO) {
+        String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
+        commentaryReplyDTO.setUserName(userName);
+        return reviewsApiClient
+                .post()
+                .uri("/commentary/reply")
+                .body(BodyInserters.fromValue(commentaryReplyDTO))
+                .retrieve()
+                .bodyToMono(CommentaryReplyDTO.class)
+                .publishOn(Schedulers.boundedElastic())
+                .onErrorMap(err -> {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid CommentaryId");
+                })
+                .map(commentaryReply -> {
+                    commentaryReply.setCommentaryId(commentaryReplyDTO.getCommentaryId());
+                    this.giveUserOnePoint(commentaryReply.getUserName());
+                    return commentaryReply;
+                });
+    }
+
+    public Mono<CommentaryEvaluationDTO> registerCommentaryEvaluation(String accessToken, CommentaryEvaluationDTO commentaryEvaluationDTO) {
+        String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
+        commentaryEvaluationDTO.setUserName(userName);
+        return reviewsApiClient
+                .post()
+                .uri("/commentary/evaluation")
+                .body(BodyInserters.fromValue(commentaryEvaluationDTO))
+                .retrieve()
+                .bodyToMono(CommentaryEvaluationDTO.class)
+                .onErrorMap(err -> {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid CommentaryId");
+                })
+                .map(commentaryEvaluation -> {
+                    commentaryEvaluation.setCommentaryId(commentaryEvaluationDTO.getCommentaryId());
+                    return commentaryEvaluation;
+                });
+    }
+
     private MovieDTO checkIfMovieWasFound(MovieDTO movieDTO) {
         if (movieDTO == null || movieDTO.Response == null || movieDTO.Response.equals("False")) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "MOVIE NOT FOUND");
@@ -111,7 +168,7 @@ public class GatewayService {
     }
 
     private void giveUserOnePoint(String userName) {
-        User user = userRepository.getById(userName);
+        User user = userRepository.findOneByUserName(userName);
         user.setPoints(user.getPoints() + 1);
         this.updateUserAuthorities(user);
         userRepository.save(user);

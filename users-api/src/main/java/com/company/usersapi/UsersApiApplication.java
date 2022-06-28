@@ -16,7 +16,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
 
 @SpringBootApplication
-
 public class UsersApiApplication {
 
     public static void main(String[] args) { SpringApplication.run(UsersApiApplication.class, args); }
@@ -34,21 +33,32 @@ public class UsersApiApplication {
                                   AuthorityRepository authorityRepository,
                                   PasswordEncoder encoder) {
         return (args) -> {
-
-            User user = new User();
-            user.setUserName("MODERADOR1");
-            user.setPassword(encoder.encode("123"));
-            user.setEnabled(true);
-            user.setPoints(1000);
-            userRepository.save(user);
-
-            List<String> authorityNamesList = List.of("LEITOR", "BÁSICO", "AVANÇADO", "MODERADOR");
-            authorityNamesList.forEach((authorityName) -> {
-                Authority authority = new Authority();
-                authority.setAuthorityKey(new AuthorityKey(user.getUserName(), authorityName));
-                authority.setUser(user);
-                authorityRepository.save(authority);
-            });
+            this.saveUser("BÁSICO1", 20, List.of("LEITOR", "BÁSICO"), userRepository, authorityRepository, encoder);
+            this.saveUser("AVANÇADO1", 100, List.of("LEITOR", "BÁSICO", "AVANÇADO"), userRepository, authorityRepository, encoder);
+            this.saveUser("MODERADOR1",1000, List.of("LEITOR", "BÁSICO", "AVANÇADO", "MODERADOR"), userRepository, authorityRepository, encoder);
         };
+    }
+
+    private void saveUser(
+            String userName,
+            int points,
+            List<String> authorities,
+            UserRepository userRepository,
+            AuthorityRepository authorityRepository,
+            PasswordEncoder encoder
+    ) {
+        User user = new User();
+        user.setUserName(userName);
+        user.setPassword(encoder.encode("123"));
+        user.setEnabled(true);
+        user.setPoints(points);
+        userRepository.save(user);
+
+        authorities.forEach((authorityName) -> {
+            Authority authority = new Authority();
+            authority.setAuthorityKey(new AuthorityKey(user.getUserName(), authorityName));
+            authority.setUser(user);
+            authorityRepository.save(authority);
+        });
     }
 }

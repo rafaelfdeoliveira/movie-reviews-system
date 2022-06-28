@@ -35,9 +35,9 @@ public class UserService {
     public UserDTO createUser(UserDTO userDTO) {
         User userWithSameUserName = userRepository.findById(userDTO.getUserName()).orElse(null);
         if (userWithSameUserName != null) throw new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "UserName already exists");
-        if (userDTO.getEnabled() == null) userDTO.setEnabled(true);
         if (userDTO.getPassword() == null) throw new ResponseStatusException(HttpStatus.PARTIAL_CONTENT, "A password must be provided");
 
+        userDTO.setEnabled(true);
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userDTO.setPoints(0);
         User user = User.convert(userDTO);
@@ -49,10 +49,17 @@ public class UserService {
     }
 
     public ResponseEntity<JwtResponse> getAuthenticationToken(JwtRequest authenticationRequest) {
-        authenticate(authenticationRequest.getUserName(), authenticationRequest.getPassword());
+        this.authenticate(authenticationRequest.getUserName(), authenticationRequest.getPassword());
         final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getUserName());
         final String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
+    }
+
+    public UserDTO getLoggedUser(String accessToken) {
+        String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
+        User user = userRepository.findById(userName).orElse(null);
+        if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "LOGGED USER NOT FOUND");
+        return UserDTO.convert(user);
     }
 
     private void authenticate(String username, String password) {
