@@ -54,7 +54,7 @@ public class UsersApiApplication {
         user.setPoints(points);
         userRepository.save(user);
 
-        authorities.forEach((authorityName) -> {
+        authorities.forEach(authorityName -> {
             Authority authority = new Authority();
             authority.setAuthorityKey(new AuthorityKey(user.getUserName(), authorityName));
             authority.setUser(user);

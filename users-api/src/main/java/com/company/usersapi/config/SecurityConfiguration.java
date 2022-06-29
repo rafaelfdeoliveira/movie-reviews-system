@@ -4,6 +4,7 @@ import com.company.usersapi.service.JwtUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -55,8 +56,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/sign_up", "/authenticate").permitAll()
-                .antMatchers("/commentary", "/commentary/reply").hasAuthority("BÁSICO")
-                .antMatchers("/commentary/evaluation").hasAuthority("AVANÇADO")
+                .antMatchers(HttpMethod.POST, "/commentary", "/commentary/reply").hasAuthority("BÁSICO")
+                .antMatchers(HttpMethod.POST, "/commentary/evaluation").hasAuthority("AVANÇADO")
+                .antMatchers("/user/find", "/user/all", "/user/admin").hasAuthority("MODERADOR")
+                .antMatchers(HttpMethod.DELETE, "/commentary").hasAuthority("MODERADOR")
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)

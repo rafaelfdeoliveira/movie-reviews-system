@@ -2,13 +2,13 @@ package com.company.usersapi.service;
 
 import com.company.usersapi.config.JwtTokenUtil;
 import com.company.usersapi.dto.UserDTO;
-import com.company.usersapi.model.Authority;
-import com.company.usersapi.model.JwtRequest;
-import com.company.usersapi.model.JwtResponse;
-import com.company.usersapi.model.User;
+import com.company.usersapi.dto.UserDTOPageData;
+import com.company.usersapi.model.*;
 import com.company.usersapi.repository.AuthorityRepository;
 import com.company.usersapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -32,7 +34,43 @@ public class UserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
 
-    public UserDTO createUser(UserDTO userDTO) {
+    public Mono<UserDTO> createUser(UserDTO userDTO) {
+        return Mono.just(userDTO)
+                .publishOn(Schedulers.boundedElastic())
+                .map(this::saveUser);
+    }
+
+    public Mono<ResponseEntity<JwtResponse>> fetchAuthenticationToken(JwtRequest authenticationRequest) {
+        return Mono.just(authenticationRequest)
+                .publishOn(Schedulers.boundedElastic())
+                .map(this::getAuthenticationToken);
+    }
+
+    public Mono<UserDTO> fetchLoggedUser(String accessToken) {
+        return Mono.just(accessToken)
+                .publishOn(Schedulers.boundedElastic())
+                .map(this::getLoggedUser);
+    }
+
+    public Mono<UserDTOPageData> fetchAllUsers(Pageable pageable) {
+        return Mono.just(pageable)
+                .publishOn(Schedulers.boundedElastic())
+                .map(this::getAllUsers);
+    }
+
+    public Mono<UserDTO> fetchUserByUserName(String userName) {
+        return Mono.just(userName)
+                .publishOn(Schedulers.boundedElastic())
+                .map(this::getUserDTOByUserName);
+    }
+
+    public Mono<UserDTO> makeUserAdmin(String userName) {
+        return Mono.just(userName)
+                .publishOn(Schedulers.boundedElastic())
+                .map(this::giveUserAdminAuthority);
+    }
+
+    private UserDTO saveUser(UserDTO userDTO) {
         User userWithSameUserName = userRepository.findById(userDTO.getUserName()).orElse(null);
         if (userWithSameUserName != null) throw new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "UserName already exists");
         if (userDTO.getPassword() == null) throw new ResponseStatusException(HttpStatus.PARTIAL_CONTENT, "A password must be provided");
@@ -48,14 +86,14 @@ public class UserService {
         return UserDTO.convert(userDB);
     }
 
-    public ResponseEntity<JwtResponse> getAuthenticationToken(JwtRequest authenticationRequest) {
+    private ResponseEntity<JwtResponse> getAuthenticationToken(JwtRequest authenticationRequest) {
         this.authenticate(authenticationRequest.getUserName(), authenticationRequest.getPassword());
         final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getUserName());
         final String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
-    public UserDTO getLoggedUser(String accessToken) {
+    private UserDTO getLoggedUser(String accessToken) {
         String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
         User user = userRepository.findById(userName).orElse(null);
         if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "LOGGED USER NOT FOUND");
@@ -70,5 +108,37 @@ public class UserService {
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "INVALID_CREDENTIALS");
         }
+    }
+
+    private UserDTOPageData getAllUsers(Pageable pageable) {
+        Page<User> usersPage = userRepository.findAll(pageable);
+        return UserDTOPageData.convertUsersPageToUserDTOPageData(usersPage);
+    }
+
+    private UserDTO getUserDTOByUserName(String userName) {
+        User user = this.getUserByUserName(userName);
+        return UserDTO.convert(user);
+    }
+
+    private UserDTO giveUserAdminAuthority(String userName) {
+        User user = this.getUserByUserName(userName);
+        List<String> currentUserRoles = user.getRoles();
+        List.of("BÁSICO", "AVANÇADO", "MODERADOR").forEach(authorityName -> {
+            if (currentUserRoles.contains(authorityName)) return;
+            Authority authority = new Authority();
+            authority.setAuthorityKey(new AuthorityKey(userName, authorityName));
+            authority.setUser(user);
+            authorityRepository.save(authority);
+        });
+
+        UserDTO userDTO = UserDTO.convert(user);
+        userDTO.setRoles(List.of("LEITOR", "BÁSICO", "AVANÇADO", "MODERADOR"));
+        return userDTO;
+    }
+
+    private User getUserByUserName(String userName) {
+        User user = userRepository.findById(userName).orElse(null);
+        if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with the provided userName was found.");
+        return user;
     }
 }

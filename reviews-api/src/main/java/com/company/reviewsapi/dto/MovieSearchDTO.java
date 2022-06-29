@@ -1,8 +1,5 @@
 package com.company.reviewsapi.dto;
 
-import com.company.reviewsapi.model.Commentary;
-import com.company.reviewsapi.model.Grade;
-
 import java.util.List;
 
 public class MovieSearchDTO {
@@ -16,8 +13,5 @@ public class MovieSearchDTO {
         public String Year;
         public String Type;
         public String Poster;
-
-        public List<Commentary> commentaries;
-        public List<Grade> grades;
     }
 }

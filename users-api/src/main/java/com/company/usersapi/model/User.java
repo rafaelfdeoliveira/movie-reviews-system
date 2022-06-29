@@ -32,10 +32,10 @@ public class User {
 
     public static User convert(UserDTO dto) {
         User user = new User();
-        user.setPoints(dto.getPoints());
-        user.setEnabled(dto.getEnabled());
-        user.setPassword(dto.getPassword());
         user.setUserName(dto.getUserName());
+        user.setPassword(dto.getPassword());
+        user.setEnabled(dto.getEnabled());
+        user.setPoints(dto.getPoints());
         return user;
     }
 

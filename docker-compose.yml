@@ -1,31 +1,7 @@
 version: "3"
 services:
-  reviews-api:
-    build:
-      context: ./reviews-api
-    networks:
-      - movie-reviews-api
-    depends_on:
-      - postgresDB
-    environment:
-      - spring.datasource.url=jdbc:postgresql://postgresDB/movie-reviews-system
-
-  users-api:
-    build:
-      context: ./users-api
-    ports:
-      - "8081:8382"
-    networks:
-      - movie-reviews-api
-    depends_on:
-      - postgresDB
-      - reviews-api
-    environment:
-      - spring.datasource.url=jdbc:postgresql://postgresDB/movie-reviews-system
-      - reviewsApiUrl=http://reviews-api:8384
-
   postgresDB:
-    image:  postgres
+    image: postgres
     restart: always
     networks:
       - movie-reviews-api
@@ -35,6 +11,36 @@ services:
       - POSTGRES_DB=movie-reviews-system
     volumes:
       - database:/postgres
+
+  reviews-api:
+    image: reviews-api
+    build:
+      context: ./reviews-api
+    networks:
+      - movie-reviews-api
+    depends_on:
+      - postgresDB
+    environment:
+      - spring.datasource.url=jdbc:postgresql://postgresDB:5432/movie-reviews-system
+    volumes:
+      - database:/reviews-api
+
+  users-api:
+    image: users-api
+    build:
+      context: ./users-api
+    ports:
+      - "8382:8382"
+    networks:
+      - movie-reviews-api
+    depends_on:
+      - reviews-api
+      - postgresDB
+    environment:
+      - spring.datasource.url=jdbc:postgresql://postgresDB:5432/movie-reviews-system
+      - reviewsApiUrl=http://reviews-api:8384
+    volumes:
+      - database:/users-api
 
 networks:
   movie-reviews-api:

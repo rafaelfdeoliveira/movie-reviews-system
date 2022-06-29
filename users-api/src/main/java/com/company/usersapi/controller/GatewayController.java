@@ -1,13 +1,16 @@
 package com.company.usersapi.controller;
 
 import com.company.usersapi.dto.*;
+import com.company.usersapi.model.PageData;
 import com.company.usersapi.service.GatewayService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 @RestController
@@ -38,12 +41,22 @@ public class GatewayController {
         return gatewayService.getMovieSearch(title, year, page);
     }
 
+    @GetMapping("/grade")
+    public Mono<PageData<GradeDTO>> getMovieGrades(@RequestParam String movieId, Pageable pageable) {
+        return gatewayService.getMovieGrades(movieId, pageable);
+    }
+
     @PostMapping("/grade")
     public Mono<GradeDTO> registerMovieGrade(
             @RequestHeader(name = "Authorization") String accessToken,
             @Valid @RequestBody GradeDTO gradeDTO
     ) {
         return gatewayService.registerMovieGrade(accessToken, gradeDTO);
+    }
+
+    @GetMapping("/commentary")
+    public Mono<PageData<CommentaryDTO>> getMovieCommentaries(@RequestParam String movieId, Pageable pageable) {
+        return gatewayService.getMovieCommentaries(movieId, pageable);
     }
 
     @PostMapping("/commentary")
@@ -54,12 +67,27 @@ public class GatewayController {
         return gatewayService.registerMovieCommentary(accessToken, commentaryDTO);
     }
 
+    @DeleteMapping("/commentary")
+    public Mono<CommentaryDTO> deleteMovieCommentary(@NotNull @Positive @RequestParam Long commentaryId) {
+        return gatewayService.deleteMovieCommentary(commentaryId);
+    }
+
+    @GetMapping("/commentary/reply")
+    public Mono<PageData<CommentaryReplyDTO>> getCommentaryReplies(@NotNull @Positive @RequestParam Long commentaryId, Pageable pageable) {
+        return gatewayService.getCommentaryReplies(commentaryId, pageable);
+    }
+
     @PostMapping("/commentary/reply")
     public Mono<CommentaryReplyDTO> registerCommentaryReply(
             @RequestHeader(name = "Authorization") String accessToken,
             @Valid @RequestBody CommentaryReplyDTO commentaryReplyDTO
     ) {
         return gatewayService.registerCommentaryReply(accessToken, commentaryReplyDTO);
+    }
+
+    @GetMapping("/commentary/evaluation")
+    public Mono<PageData<CommentaryEvaluationDTO>> getCommentaryEvaluations(@NotNull @Positive @RequestParam Long commentaryId, Pageable pageable) {
+        return gatewayService.getCommentaryEvaluations(commentaryId, pageable);
     }
 
     @PostMapping("/commentary/evaluation")

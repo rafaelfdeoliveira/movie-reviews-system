@@ -14,8 +14,5 @@ public class MovieSearchDTO {
         public String Year;
         public String Type;
         public String Poster;
-
-        public List<MovieDTO.Commentary> commentaries;
-        public List<MovieDTO.Grade> grades;
     }
 }

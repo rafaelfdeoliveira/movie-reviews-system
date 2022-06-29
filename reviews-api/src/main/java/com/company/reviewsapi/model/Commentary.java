@@ -1,5 +1,6 @@
 package com.company.reviewsapi.model;
 
+import com.company.reviewsapi.dto.CommentaryDTO;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,10 +28,18 @@ public class Commentary {
     private String text;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "commentary", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "commentary", cascade = CascadeType.ALL)
     private Set<CommentaryReply> commentaryReplies = new HashSet<>();
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "commentary", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "commentary", cascade = CascadeType.ALL)
     private Set<CommentaryEvaluation> commentaryEvaluations = new HashSet<>();
+
+    public static Commentary convert(CommentaryDTO dto) {
+        Commentary commentary = new Commentary();
+        commentary.setUserName(dto.getUserName());
+        commentary.setMovieId(dto.getMovieId());
+        commentary.setText(dto.getText());
+        return commentary;
+    }
 }

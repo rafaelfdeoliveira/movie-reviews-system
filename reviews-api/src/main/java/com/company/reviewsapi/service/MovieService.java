@@ -2,8 +2,6 @@ package com.company.reviewsapi.service;
 
 import com.company.reviewsapi.dto.MovieDTO;
 import com.company.reviewsapi.dto.MovieSearchDTO;
-import com.company.reviewsapi.repository.CommentaryRepository;
-import com.company.reviewsapi.repository.GradeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -17,8 +15,6 @@ import reactor.core.scheduler.Schedulers;
 @RequiredArgsConstructor
 public class MovieService {
     private final WebClient omdbApiClient;
-    private final CommentaryRepository commentaryRepository;
-    private final GradeRepository gradeRepository;
 
     @Value("${omdbApiKey}")
     private String omdbApiKey;
@@ -33,7 +29,6 @@ public class MovieService {
                         .build())
                 .retrieve()
                 .bodyToMono(MovieDTO.class)
-                .publishOn(Schedulers.boundedElastic())
                 .onErrorMap(err -> {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie no found");
                 })
@@ -41,17 +36,29 @@ public class MovieService {
                     if (movieDTO == null || movieDTO.Response == null || movieDTO.Response.equals("False")) {
                         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie no found");
                     }
-                    return this.addMovieCommentariesAndGrades(movieDTO);
+                    return movieDTO;
                 });
     }
 
+    //    @Cacheable(value = "movies", key = "#movieId")
     public Mono<MovieDTO> getMovieById(String movieId) {
-        return this.fetchMovieDataById(movieId)
-                .publishOn(Schedulers.boundedElastic())
+        return omdbApiClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("apikey", omdbApiKey)
+                        .queryParam("i", movieId)
+                        .build())
+                .retrieve()
+                .bodyToMono(MovieDTO.class)
                 .onErrorMap(err -> {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid MovieId");
                 })
-                .map(this::addMovieCommentariesAndGrades);
+                .map(movieDTO -> {
+                    if (movieDTO == null || movieDTO.Response == null || movieDTO.Response.equals("False")) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid MovieId");
+                    }
+                    return movieDTO;
+                });
     }
 
     public Mono<MovieSearchDTO> getMovieSearch(String title, String year, Integer page) {
@@ -73,42 +80,7 @@ public class MovieService {
                     if (movieSearchDTO == null || movieSearchDTO.Response == null || movieSearchDTO.Response.equals("False")) {
                         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "NO MOVIES FOUND");
                     }
-                    return this.addMovieSearchCommentariesAndGrades(movieSearchDTO);
+                    return movieSearchDTO;
                 });
-    }
-
-    //    @Cacheable(value = "movies", key = "#movieId")
-    public Mono<MovieDTO> fetchMovieDataById(String movieId) {
-        return omdbApiClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("apikey", omdbApiKey)
-                        .queryParam("i", movieId)
-                        .build())
-                .retrieve()
-                .bodyToMono(MovieDTO.class)
-                .onErrorMap(err -> {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid MovieId");
-                })
-                .map(movieDTO -> {
-                    if (movieDTO == null || movieDTO.Response == null || movieDTO.Response.equals("False")) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid MovieId");
-                    }
-                    return movieDTO;
-                });
-    }
-
-    private MovieDTO addMovieCommentariesAndGrades(MovieDTO movieDTO) {
-        movieDTO.commentaries = commentaryRepository.findByMovieId(movieDTO.imdbID);
-        movieDTO.grades = gradeRepository.findByMovieId(movieDTO.imdbID);
-        return movieDTO;
-    }
-
-    private MovieSearchDTO addMovieSearchCommentariesAndGrades(MovieSearchDTO movieSearchDTO) {
-        movieSearchDTO.Search.forEach(movie -> {
-            movie.commentaries = commentaryRepository.findByMovieId(movie.imdbID);
-            movie.grades = gradeRepository.findByMovieId(movie.imdbID);
-        });
-        return movieSearchDTO;
     }
 }

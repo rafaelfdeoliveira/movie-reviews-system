@@ -1,7 +1,5 @@
 package com.company.reviewsapi.dto;
 
-import com.company.reviewsapi.model.Commentary;
-import com.company.reviewsapi.model.Grade;
 import java.util.List;
 
 public class MovieDTO {
@@ -30,9 +28,6 @@ public class MovieDTO {
     public String Production;
     public String Website;
     public String Response;
-
-    public List<Commentary> commentaries;
-    public List<Grade> grades;
 
     public static class Rating {
         public String Source;

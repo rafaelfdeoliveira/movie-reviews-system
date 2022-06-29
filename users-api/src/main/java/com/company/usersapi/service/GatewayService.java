@@ -3,10 +3,13 @@ package com.company.usersapi.service;
 import com.company.usersapi.config.JwtTokenUtil;
 import com.company.usersapi.dto.*;
 import com.company.usersapi.model.Authority;
+import com.company.usersapi.model.PageData;
 import com.company.usersapi.model.User;
 import com.company.usersapi.repository.AuthorityRepository;
 import com.company.usersapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -15,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,11 +39,9 @@ public class GatewayService {
                         .build())
                 .retrieve()
                 .bodyToMono(MovieDTO.class)
-                .publishOn(Schedulers.boundedElastic())
                 .onErrorMap(err -> {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "MOVIE NOT FOUND");
-                })
-                .map(this::checkIfMovieWasFound);
+                });
     }
 
     public Mono<MovieDTO> getMovieById(String movieId) {
@@ -51,11 +53,9 @@ public class GatewayService {
                         .build())
                 .retrieve()
                 .bodyToMono(MovieDTO.class)
-                .publishOn(Schedulers.boundedElastic())
                 .onErrorMap(err -> {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "MOVIE NOT FOUND");
-                })
-                .map(this::checkIfMovieWasFound);
+                });
     }
 
     public Mono<MovieSearchDTO> getMovieSearch(String title, String year, Integer page) {
@@ -69,11 +69,23 @@ public class GatewayService {
                         .build())
                 .retrieve()
                 .bodyToMono(MovieSearchDTO.class)
-                .publishOn(Schedulers.boundedElastic())
                 .onErrorMap(err -> {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "NO MOVIES FOUND");
-                })
-                .map(this::checkIfMovieSearchFailed);
+                });
+    }
+
+    public Mono<PageData<GradeDTO>> getMovieGrades(String movieId, Pageable pageable) {
+        return reviewsApiClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/grade")
+                        .queryParam("movieId", movieId)
+                        .queryParam("page", pageable.getPageNumber())
+                        .queryParam("size", pageable.getPageSize())
+                        .queryParam("sort", this.getSortParametersArray(pageable))
+                        .build())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {});
     }
 
     public Mono<GradeDTO> registerMovieGrade(String accessToken, GradeDTO gradeDTO) {
@@ -95,6 +107,20 @@ public class GatewayService {
                 });
     }
 
+    public Mono<PageData<CommentaryDTO>> getMovieCommentaries(String movieId, Pageable pageable) {
+        return reviewsApiClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/commentary")
+                        .queryParam("movieId", movieId)
+                        .queryParam("page", pageable.getPageNumber())
+                        .queryParam("size", pageable.getPageSize())
+                        .queryParam("sort", this.getSortParametersArray(pageable))
+                        .build())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {});
+    }
+
     public Mono<CommentaryDTO> registerMovieCommentary(String accessToken, CommentaryDTO commentaryDTO) {
         String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
         commentaryDTO.setUserName(userName);
@@ -112,7 +138,41 @@ public class GatewayService {
                     this.giveUserOnePoint(commentary.getUserName());
                     return commentary;
                 });
+    }
 
+    public Mono<CommentaryDTO> deleteMovieCommentary(Long commentaryId) {
+        return reviewsApiClient
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/commentary")
+                        .queryParam("commentaryId", commentaryId)
+                        .build())
+                .retrieve()
+                .bodyToMono(CommentaryDTO.class)
+                .onErrorMap(err -> {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Commentary with provided commentaryId was not found");
+                });
+    }
+
+    public Mono<PageData<CommentaryReplyDTO>> getCommentaryReplies(Long commentaryId, Pageable pageable) {
+        return reviewsApiClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/commentary/reply")
+                        .queryParam("commentaryId", commentaryId)
+                        .queryParam("page", pageable.getPageNumber())
+                        .queryParam("size", pageable.getPageSize())
+                        .queryParam("sort", this.getSortParametersArray(pageable))
+                        .build())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<PageData<CommentaryReplyDTO>>() {})
+                .onErrorMap(err -> {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Commentary with provided commentaryId was not found");
+                })
+                .map(commentaryReplyDTOPageData -> {
+                    commentaryReplyDTOPageData.content.forEach(commentaryReplyDTO -> commentaryReplyDTO.setCommentaryId(commentaryId));
+                    return commentaryReplyDTOPageData;
+                });
     }
 
     public Mono<CommentaryReplyDTO> registerCommentaryReply(String accessToken, CommentaryReplyDTO commentaryReplyDTO) {
@@ -135,6 +195,27 @@ public class GatewayService {
                 });
     }
 
+    public Mono<PageData<CommentaryEvaluationDTO>> getCommentaryEvaluations(Long commentaryId, Pageable pageable) {
+        return reviewsApiClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("commentary/evaluation")
+                        .queryParam("commentaryId", commentaryId)
+                        .queryParam("page", pageable.getPageNumber())
+                        .queryParam("size", pageable.getPageSize())
+                        .queryParam("sort", this.getSortParametersArray(pageable))
+                        .build())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<PageData<CommentaryEvaluationDTO>>() {})
+                .onErrorMap(err -> {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Commentary with commentaryId was not found");
+                })
+                .map(commentaryEvaluationDTOPageData -> {
+                    commentaryEvaluationDTOPageData.content.forEach(commentaryEvaluationDTO -> commentaryEvaluationDTO.setCommentaryId(commentaryId));
+                    return commentaryEvaluationDTOPageData;
+                });
+    }
+
     public Mono<CommentaryEvaluationDTO> registerCommentaryEvaluation(String accessToken, CommentaryEvaluationDTO commentaryEvaluationDTO) {
         String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
         commentaryEvaluationDTO.setUserName(userName);
@@ -153,18 +234,10 @@ public class GatewayService {
                 });
     }
 
-    private MovieDTO checkIfMovieWasFound(MovieDTO movieDTO) {
-        if (movieDTO == null || movieDTO.Response == null || movieDTO.Response.equals("False")) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "MOVIE NOT FOUND");
-        }
-        return  movieDTO;
-    }
-
-    private MovieSearchDTO checkIfMovieSearchFailed(MovieSearchDTO movieSearchDTO) {
-        if (movieSearchDTO == null || movieSearchDTO.Response == null || movieSearchDTO.Response.equals("False")) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "NO MOVIES FOUND");
-        }
-        return movieSearchDTO;
+    private Object[] getSortParametersArray(Pageable pageable) {
+        List<String> sorts = new ArrayList<>();
+        pageable.getSort().forEach(order -> sorts.add(String.join(",", order.getProperty(), order.getDirection().toString())));
+        return sorts.toArray();
     }
 
     private void giveUserOnePoint(String userName) {
