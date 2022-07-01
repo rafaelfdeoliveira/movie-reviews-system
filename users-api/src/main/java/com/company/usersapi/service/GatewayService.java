@@ -1,12 +1,12 @@
 package com.company.usersapi.service;
 
-import com.company.usersapi.config.JwtTokenUtil;
 import com.company.usersapi.dto.*;
 import com.company.usersapi.model.Authority;
 import com.company.usersapi.model.User;
 import com.company.usersapi.repository.AuthorityRepository;
 import com.company.usersapi.repository.UserRepository;
-import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCachePut;
+import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCacheEvict;
+import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCaching;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GatewayService {
     private final WebClient reviewsApiClient;
-    private final JwtTokenUtil jwtTokenUtil;
     private final UserRepository userRepository;
     private final UserService userService;
     private final AuthorityRepository authorityRepository;
@@ -92,8 +91,14 @@ public class GatewayService {
                 });
     }
 
-    public Mono<GradeDTO> registerMovieGrade(String accessToken, GradeDTO gradeDTO) {
-        String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
+
+
+    @ReactiveRedisCaching(evict = {
+            @ReactiveRedisCacheEvict(cacheName = "userDTOByUserName", key = "#userName"),
+            @ReactiveRedisCacheEvict(cacheName = "userByUserName", key = "#userName"),
+            @ReactiveRedisCacheEvict(cacheName = "userDetailsByUserName", key = "#userName")
+    })
+    public Mono<GradeDTO> registerMovieGrade(String userName, GradeDTO gradeDTO) {
         gradeDTO.setUserName(userName);
         return reviewsApiClient
                 .post()
@@ -128,8 +133,12 @@ public class GatewayService {
                 });
     }
 
-    public Mono<CommentaryDTO> registerMovieCommentary(String accessToken, CommentaryDTO commentaryDTO) {
-        String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
+    @ReactiveRedisCaching(evict = {
+            @ReactiveRedisCacheEvict(cacheName = "userDTOByUserName", key = "#userName"),
+            @ReactiveRedisCacheEvict(cacheName = "userByUserName", key = "#userName"),
+            @ReactiveRedisCacheEvict(cacheName = "userDetailsByUserName", key = "#userName")
+    })
+    public Mono<CommentaryDTO> registerMovieCommentary(String userName, CommentaryDTO commentaryDTO) {
         commentaryDTO.setUserName(userName);
         return reviewsApiClient
                 .post()
@@ -182,8 +191,12 @@ public class GatewayService {
                 });
     }
 
-    public Mono<CommentaryReplyDTO> registerCommentaryReply(String accessToken, CommentaryReplyDTO commentaryReplyDTO) {
-        String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
+    @ReactiveRedisCaching(evict = {
+            @ReactiveRedisCacheEvict(cacheName = "userDTOByUserName", key = "#userName"),
+            @ReactiveRedisCacheEvict(cacheName = "userByUserName", key = "#userName"),
+            @ReactiveRedisCacheEvict(cacheName = "userDetailsByUserName", key = "#userName")
+    })
+    public Mono<CommentaryReplyDTO> registerCommentaryReply(String userName, CommentaryReplyDTO commentaryReplyDTO) {
         commentaryReplyDTO.setUserName(userName);
         return reviewsApiClient
                 .post()
@@ -223,8 +236,7 @@ public class GatewayService {
                 });
     }
 
-    public Mono<CommentaryEvaluationDTO> registerCommentaryEvaluation(String accessToken, CommentaryEvaluationDTO commentaryEvaluationDTO) {
-        String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
+    public Mono<CommentaryEvaluationDTO> registerCommentaryEvaluation(String userName, CommentaryEvaluationDTO commentaryEvaluationDTO) {
         commentaryEvaluationDTO.setUserName(userName);
         return reviewsApiClient
                 .post()
@@ -247,12 +259,11 @@ public class GatewayService {
         return sorts.toArray();
     }
 
-    @ReactiveRedisCachePut(cacheName = "userByUserName", key = "#userName", timeout = 1800)
-    private User giveUserOnePoint(String userName) {
+    private void giveUserOnePoint(String userName) {
         User user = this.userService.getUserByUserName(userName);
         user.setPoints(user.getPoints() + 1);
         this.updateUserAuthorities(user);
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     private void updateUserAuthorities(User user) {

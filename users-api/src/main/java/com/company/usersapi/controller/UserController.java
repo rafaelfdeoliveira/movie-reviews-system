@@ -1,5 +1,6 @@
 package com.company.usersapi.controller;
 
+import com.company.usersapi.config.JwtTokenUtil;
 import com.company.usersapi.dto.RestPage;
 import com.company.usersapi.dto.UserDTO;
 import com.company.usersapi.model.JwtRequest;
@@ -21,6 +22,7 @@ import javax.validation.constraints.NotNull;
 @CrossOrigin
 public class UserController {
     private final UserService userService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/sign_up")
     @ResponseStatus(HttpStatus.CREATED)
@@ -35,7 +37,8 @@ public class UserController {
 
     @GetMapping("/user")
     public Mono<UserDTO> fetchLoggedUser(@RequestHeader(name = "Authorization") String accessToken) {
-        return userService.fetchLoggedUser(accessToken);
+        String userName = this.getUserNameFromAccessToken(accessToken);
+        return userService.fetchUserByUserName(userName);
     }
 
     @GetMapping("/user/all")
@@ -51,5 +54,9 @@ public class UserController {
     @PatchMapping("/user/admin")
     public Mono<UserDTO> makeUserAdmin(@NotNull @NotBlank @RequestParam String userName) {
         return userService.makeUserAdmin(userName);
+    }
+
+    private String getUserNameFromAccessToken(String accessToken) {
+        return jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
     }
 }

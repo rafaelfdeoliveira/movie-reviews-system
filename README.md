@@ -18,6 +18,7 @@ docker-compose down
 
 The application endpoints are all documented with description and examples in the json file at the root of the project named Movie Reviews System.postman_collection.json.
 Import it to Postman (https://www.postman.com/downloads/) in order to see it.
+The base Url for all endpoints is http://localhost:8382/
 
 To facilitate testing, the following users are automatically created when the application starts (all registered with password 123):
 MODERADOR1  - Authorities: LEITOR, BÁSICO, AVANÇADO, MODERADOR

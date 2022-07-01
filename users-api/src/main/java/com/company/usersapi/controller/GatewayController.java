@@ -1,5 +1,6 @@
 package com.company.usersapi.controller;
 
+import com.company.usersapi.config.JwtTokenUtil;
 import com.company.usersapi.dto.*;
 import com.company.usersapi.service.GatewayService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import javax.validation.constraints.Positive;
 @CrossOrigin
 public class GatewayController {
     private final GatewayService gatewayService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("/movie/title")
     public Mono<MovieDTO> getMovieByTitle(
@@ -50,7 +52,8 @@ public class GatewayController {
             @RequestHeader(name = "Authorization") String accessToken,
             @Valid @RequestBody GradeDTO gradeDTO
     ) {
-        return gatewayService.registerMovieGrade(accessToken, gradeDTO);
+        String userName = this.getUserNameFromAccessToken(accessToken);
+        return gatewayService.registerMovieGrade(userName, gradeDTO);
     }
 
     @GetMapping("/commentary")
@@ -63,7 +66,8 @@ public class GatewayController {
             @RequestHeader(name = "Authorization") String accessToken,
             @Valid @RequestBody CommentaryDTO commentaryDTO
     ) {
-        return gatewayService.registerMovieCommentary(accessToken, commentaryDTO);
+        String userName = this.getUserNameFromAccessToken(accessToken);
+        return gatewayService.registerMovieCommentary(userName, commentaryDTO);
     }
 
     @DeleteMapping("/commentary")
@@ -81,7 +85,8 @@ public class GatewayController {
             @RequestHeader(name = "Authorization") String accessToken,
             @Valid @RequestBody CommentaryReplyDTO commentaryReplyDTO
     ) {
-        return gatewayService.registerCommentaryReply(accessToken, commentaryReplyDTO);
+        String userName = this.getUserNameFromAccessToken(accessToken);
+        return gatewayService.registerCommentaryReply(userName, commentaryReplyDTO);
     }
 
     @GetMapping("/commentary/evaluation")
@@ -94,6 +99,11 @@ public class GatewayController {
         @RequestHeader(name = "Authorization") String accessToken,
         @Valid @RequestBody CommentaryEvaluationDTO commentaryEvaluationDTO
     ) {
-        return gatewayService.registerCommentaryEvaluation(accessToken, commentaryEvaluationDTO);
+        String userName = this.getUserNameFromAccessToken(accessToken);
+        return gatewayService.registerCommentaryEvaluation(userName, commentaryEvaluationDTO);
+    }
+
+    private String getUserNameFromAccessToken(String accessToken) {
+        return jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
     }
 }

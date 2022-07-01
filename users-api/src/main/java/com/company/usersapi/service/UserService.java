@@ -7,7 +7,9 @@ import com.company.usersapi.model.*;
 import com.company.usersapi.repository.AuthorityRepository;
 import com.company.usersapi.repository.UserRepository;
 import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCacheEvict;
+import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCachePut;
 import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCacheable;
+import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCaching;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +39,7 @@ public class UserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
 
-    @ReactiveRedisCacheEvict(cacheName = "userByUserName", key = "#userDTO.userName")
+    @ReactiveRedisCachePut(cacheName = "userDTOByUserName", key = "#userDTO.userName", timeout = 1800)
     public Mono<UserDTO> createUser(UserDTO userDTO) {
         return Mono.just(userDTO)
                 .publishOn(Schedulers.boundedElastic())
@@ -50,12 +52,6 @@ public class UserService {
                 .map(this::getAuthenticationToken);
     }
 
-    public Mono<UserDTO> fetchLoggedUser(String accessToken) {
-        return Mono.just(accessToken)
-                .publishOn(Schedulers.boundedElastic())
-                .map(this::getLoggedUser);
-    }
-
     public Mono<RestPage<UserDTO>> fetchAllUsers(Pageable pageable) {
         return Mono.just(pageable)
                 .publishOn(Schedulers.boundedElastic())
@@ -65,13 +61,21 @@ public class UserService {
                 });
     }
 
+    @ReactiveRedisCacheable(cacheName = "userDTOByUserName", key = "#userName", timeout = 1800)
     public Mono<UserDTO> fetchUserByUserName(String userName) {
         return Mono.just(userName)
                 .publishOn(Schedulers.boundedElastic())
                 .map(this::getUserDTOByUserName);
     }
 
-    @ReactiveRedisCacheEvict(cacheName = "userByUserName", key = "#userName")
+
+    @ReactiveRedisCaching(
+            put = @ReactiveRedisCachePut(cacheName = "userDTOByUserName", key = "#userName", timeout = 1800),
+            evict = {
+                    @ReactiveRedisCacheEvict(cacheName = "userByUserName", key = "#userName"),
+                    @ReactiveRedisCacheEvict(cacheName = "userDetailsByUserName", key = "#userName")
+            }
+    )
     public Mono<UserDTO> makeUserAdmin(String userName) {
         return Mono.just(userName)
                 .publishOn(Schedulers.boundedElastic())
@@ -79,7 +83,7 @@ public class UserService {
     }
 
     @ReactiveRedisCacheable(cacheName = "userByUserName", key = "#userName", timeout = 1800)
-    protected User getUserByUserName(String userName) {
+    public User getUserByUserName(String userName) {
         return userRepository.findById(userName).orElse(null);
     }
 
@@ -104,13 +108,6 @@ public class UserService {
         final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getUserName());
         final String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
-    }
-
-    private UserDTO getLoggedUser(String accessToken) {
-        String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
-        User user = this.getUserByUserName(userName);
-        if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "LOOGED USER NOT FOUND");
-        return UserDTO.convert(user);
     }
 
     private void authenticate(String username, String password) {
