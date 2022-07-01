@@ -1,7 +1,7 @@
 package com.company.reviewsapi.controller;
 
 import com.company.reviewsapi.dto.CommentaryDTO;
-import com.company.reviewsapi.dto.CommentaryDTOPage;
+import com.company.reviewsapi.dto.RestPage;
 import com.company.reviewsapi.service.CommentaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +15,7 @@ public class CommentaryController {
     private final CommentaryService commentaryService;
 
     @GetMapping
-    public Mono<CommentaryDTOPage> fetchMovieCommentaries(@RequestParam String movieId, Pageable pageable) {
+    public Mono<RestPage<CommentaryDTO>> fetchMovieCommentaries(@RequestParam String movieId, Pageable pageable) {
         return commentaryService.fetchMovieCommentaries(movieId, pageable);
     }
 

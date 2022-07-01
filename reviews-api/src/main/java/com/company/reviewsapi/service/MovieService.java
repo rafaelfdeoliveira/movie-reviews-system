@@ -2,6 +2,7 @@ package com.company.reviewsapi.service;
 
 import com.company.reviewsapi.dto.MovieDTO;
 import com.company.reviewsapi.dto.MovieSearchDTO;
+import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCacheable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ public class MovieService {
     @Value("${omdbApiKey}")
     private String omdbApiKey;
 
+    @ReactiveRedisCacheable(cacheName = "moviesByTitle", key = "#title + '_' + #year", timeout = 1800)
     public Mono<MovieDTO> getMovieByTitle(String title, String year) {
         return omdbApiClient
                 .get()
@@ -40,7 +42,7 @@ public class MovieService {
                 });
     }
 
-    //    @Cacheable(value = "movies", key = "#movieId")
+    @ReactiveRedisCacheable(cacheName = "moviesById", key = "#movieId", timeout = 1800)
     public Mono<MovieDTO> getMovieById(String movieId) {
         return omdbApiClient
                 .get()
@@ -61,6 +63,7 @@ public class MovieService {
                 });
     }
 
+    @ReactiveRedisCacheable(cacheName = "moviesSearch", key = "#title + '_' + #year + '_' + #page", timeout = 1800)
     public Mono<MovieSearchDTO> getMovieSearch(String title, String year, Integer page) {
         return omdbApiClient
                 .get()

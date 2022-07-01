@@ -1,7 +1,6 @@
 package com.company.usersapi.controller;
 
 import com.company.usersapi.dto.*;
-import com.company.usersapi.model.PageData;
 import com.company.usersapi.service.GatewayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +41,7 @@ public class GatewayController {
     }
 
     @GetMapping("/grade")
-    public Mono<PageData<GradeDTO>> getMovieGrades(@RequestParam String movieId, Pageable pageable) {
+    public Mono<RestPage<GradeDTO>> getMovieGrades(@RequestParam String movieId, Pageable pageable) {
         return gatewayService.getMovieGrades(movieId, pageable);
     }
 
@@ -55,7 +54,7 @@ public class GatewayController {
     }
 
     @GetMapping("/commentary")
-    public Mono<PageData<CommentaryDTO>> getMovieCommentaries(@RequestParam String movieId, Pageable pageable) {
+    public Mono<RestPage<CommentaryDTO>> getMovieCommentaries(@RequestParam String movieId, Pageable pageable) {
         return gatewayService.getMovieCommentaries(movieId, pageable);
     }
 
@@ -73,7 +72,7 @@ public class GatewayController {
     }
 
     @GetMapping("/commentary/reply")
-    public Mono<PageData<CommentaryReplyDTO>> getCommentaryReplies(@NotNull @Positive @RequestParam Long commentaryId, Pageable pageable) {
+    public Mono<RestPage<CommentaryReplyDTO>> getCommentaryReplies(@NotNull @Positive @RequestParam Long commentaryId, Pageable pageable) {
         return gatewayService.getCommentaryReplies(commentaryId, pageable);
     }
 
@@ -86,7 +85,7 @@ public class GatewayController {
     }
 
     @GetMapping("/commentary/evaluation")
-    public Mono<PageData<CommentaryEvaluationDTO>> getCommentaryEvaluations(@NotNull @Positive @RequestParam Long commentaryId, Pageable pageable) {
+    public Mono<RestPage<CommentaryEvaluationDTO>> getCommentaryEvaluations(@NotNull @Positive @RequestParam Long commentaryId, Pageable pageable) {
         return gatewayService.getCommentaryEvaluations(commentaryId, pageable);
     }
 

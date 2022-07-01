@@ -1,0 +1,3450 @@
+{
+	"info": {
+		"_postman_id": "3e014a41-9a80-4851-9ea4-e80166767b60",
+		"name": "Movie Reviews System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20172964"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Authenticate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.collectionVariables.set('accessToken', pm.response.json().token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userName\": \"MODERADOR1\",\n    \"password\": \"123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/authenticate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authenticate"
+							]
+						},
+						"description": "Get Authentication token given correct userName and password.\n\nTo facilitate testing, the following users with password 123 are automatically created when the program starts with the following authorities:\n\nuserName: MODERADOR1 / Authorities: LEITOR, BÁSICO, AVANÇADO, MODERADOR\n\nuserName: AVANÇADO1 / Authorities: LEITOR, BÁSICO, AVANÇADO\n\nuserName: BÁSICO1 / Authorities: LEITOR, BÁSICO\n\nThe authentication token obtained as response of this request must be set as the value of the parameter Authorization (in the format Bearer ) in the Header of all requests of this API, except Authenticate and Register User requests."
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get Logged User Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user"
+							]
+						},
+						"description": "Get the logged user profile (corresponding to the given access token provided as authentication)"
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 23:05:27 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"userName\": \"MODERADOR1\",\n    \"password\": null,\n    \"enabled\": true,\n    \"points\": 1005,\n    \"roles\": [\n        \"LEITOR\",\n        \"BÁSICO\",\n        \"AVANÇADO\",\n        \"MODERADOR\"\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Register User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userName\": \"newUser\",\n    \"password\": \"123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sign_up",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"sign_up"
+							]
+						},
+						"description": "Register a new User with role \"LEITOR\" given a userName and password.\n\nNo Authentication is need for the request."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userName\": \"newUser\",\n    \"password\": \"123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sign_up",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"sign_up"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 23:06:30 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"userName\": \"newUser\",\n    \"password\": null,\n    \"enabled\": true,\n    \"points\": 0,\n    \"roles\": [\n        \"LEITOR\"\n    ]\n}"
+						},
+						{
+							"name": "Unsuccessful operation - A user with same userName is already registered in the database",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userName\": \"newUser\",\n    \"password\": \"123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sign_up",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"sign_up"
+									]
+								}
+							},
+							"status": "Already Reported (WebDAV) (RFC 5842)",
+							"code": 208,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 23:06:46 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-28T23:06:46.395+00:00\",\n    \"status\": 208,\n    \"error\": \"Already Reported\",\n    \"path\": \"/sign_up\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/user/all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"all"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Page number to receive starting at 0 for the first page",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"description": "Number of users to receive in the page",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "userName,asc",
+									"description": "The results can be sorted by userName. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. userName,desc).",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginaterd users profiles.\n\nThe authorized user must have the Authority \"MODERADOR\" in order to make this request.\n\nAll parameters are optional."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/all",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"all"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Page number to receive starting at 0 for the first page",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "20",
+											"description": "Number of users to receive in the page",
+											"disabled": true
+										},
+										{
+											"key": "sort",
+											"value": "userName,asc",
+											"description": "The results can be sorted by userName. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. userName,desc).",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 29 Jun 2022 01:13:43 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"content\": [\n        {\n            \"userName\": \"BÁSICO1\",\n            \"password\": null,\n            \"enabled\": true,\n            \"points\": 20,\n            \"roles\": [\n                \"LEITOR\",\n                \"BÁSICO\"\n            ]\n        },\n        {\n            \"userName\": \"AVANÇADO1\",\n            \"password\": null,\n            \"enabled\": true,\n            \"points\": 100,\n            \"roles\": [\n                \"LEITOR\",\n                \"BÁSICO\",\n                \"AVANÇADO\"\n            ]\n        },\n        {\n            \"userName\": \"MODERADOR1\",\n            \"password\": null,\n            \"enabled\": true,\n            \"points\": 1000,\n            \"roles\": [\n                \"LEITOR\",\n                \"BÁSICO\",\n                \"AVANÇADO\",\n                \"MODERADOR\"\n            ]\n        },\n        {\n            \"userName\": \"newUser\",\n            \"password\": null,\n            \"enabled\": true,\n            \"points\": 0,\n            \"roles\": [\n                \"LEITOR\"\n            ]\n        },\n        {\n            \"userName\": \"newUser2\",\n            \"password\": null,\n            \"enabled\": true,\n            \"points\": 0,\n            \"roles\": [\n                \"LEITOR\"\n            ]\n        },\n        {\n            \"userName\": \"newUser3\",\n            \"password\": null,\n            \"enabled\": true,\n            \"points\": 0,\n            \"roles\": [\n                \"LEITOR\"\n            ]\n        }\n    ],\n    \"pageable\": {\n        \"sort\": {\n            \"empty\": true,\n            \"sorted\": false,\n            \"unsorted\": true\n        },\n        \"offset\": 0,\n        \"pageNumber\": 0,\n        \"pageSize\": 20,\n        \"paged\": true,\n        \"unpaged\": false\n    },\n    \"last\": true,\n    \"totalPages\": 1,\n    \"totalElements\": 6,\n    \"size\": 20,\n    \"number\": 0,\n    \"sort\": {\n        \"empty\": true,\n        \"sorted\": false,\n        \"unsorted\": true\n    },\n    \"first\": true,\n    \"numberOfElements\": 6,\n    \"empty\": false\n}"
+						}
+					]
+				},
+				{
+					"name": "Get User by UserName",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/user/find?userName=MODERADOR1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"find"
+							],
+							"query": [
+								{
+									"key": "userName",
+									"value": "MODERADOR1",
+									"description": "Obrigatory"
+								}
+							]
+						},
+						"description": "Get the profile of the user with the provided userName.\n\nThe authorized user must have the Authority \"MODERADOR\" in order to make this request."
+					},
+					"response": [
+						{
+							"name": "Unsuccessful operation - User with provided userName not found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/find?userName=asdasd",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"find"
+									],
+									"query": [
+										{
+											"key": "userName",
+											"value": "asdasd",
+											"description": "Obrigatory"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 29 Jun 2022 01:12:25 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-29T01:12:25.081+00:00\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"path\": \"/user/find\"\n}"
+						},
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/find?userName=MODERADOR1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"find"
+									],
+									"query": [
+										{
+											"key": "userName",
+											"value": "MODERADOR1",
+											"description": "Obrigatory"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 29 Jun 2022 01:13:25 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"userName\": \"MODERADOR1\",\n    \"password\": null,\n    \"enabled\": true,\n    \"points\": 1000,\n    \"roles\": [\n        \"LEITOR\",\n        \"BÁSICO\",\n        \"AVANÇADO\",\n        \"MODERADOR\"\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Make User Admin",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/user/admin?userName=newUser",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"admin"
+							],
+							"query": [
+								{
+									"key": "userName",
+									"value": "newUser"
+								}
+							]
+						},
+						"description": "Give all authorities (BÁSICO, AVANÇADO AND MODERADOR) to the user with the provided userName.\n\nThe authorized user must have the Authority \"MODERADOR\" in order to make this request."
+					},
+					"response": [
+						{
+							"name": "Unsuccessful operation - User with provided userName not found",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/admin?userName=dasdsa",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"admin"
+									],
+									"query": [
+										{
+											"key": "userName",
+											"value": "dasdsa",
+											"description": "Obrigatory"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 29 Jun 2022 05:16:08 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-29T05:16:08.809+00:00\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"path\": \"/user/admin\"\n}"
+						},
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/admin?userName=newUser",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"admin"
+									],
+									"query": [
+										{
+											"key": "userName",
+											"value": "newUser",
+											"description": "Obrigatory"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 29 Jun 2022 05:16:43 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"userName\": \"newUser\",\n    \"password\": null,\n    \"enabled\": true,\n    \"points\": 0,\n    \"roles\": [\n        \"LEITOR\",\n        \"BÁSICO\",\n        \"AVANÇADO\",\n        \"MODERADOR\"\n    ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Movies",
+			"item": [
+				{
+					"name": "Get Movie By Title",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/movie/title?title=Rambo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movie",
+								"title"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "Rambo",
+									"description": "Obrigatory - title of the movie"
+								},
+								{
+									"key": "year",
+									"value": "2014",
+									"description": "Optional - movie release year",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get movies details of the most popular movie that matches the given movie title and the given year, if provided."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/movie/title?title=Rambo",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"movie",
+										"title"
+									],
+									"query": [
+										{
+											"key": "title",
+											"value": "Rambo"
+										},
+										{
+											"key": "year",
+											"value": "2014",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 23:04:13 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"imdbID\": \"tt0462499\",\n    \"Title\": \"Rambo\",\n    \"Year\": \"2008\",\n    \"Rated\": \"R\",\n    \"Released\": \"25 Jan 2008\",\n    \"Runtime\": \"92 min\",\n    \"Genre\": \"Action, Adventure, Thriller\",\n    \"Director\": \"Sylvester Stallone\",\n    \"Writer\": \"Art Monterastelli, Sylvester Stallone, David Morrell\",\n    \"Actors\": \"Sylvester Stallone, Julie Benz, Matthew Marsden\",\n    \"Plot\": \"In Thailand, John Rambo joins a group of mercenaries to venture into war-torn Burma, and rescue a group of Christian aid workers who were kidnapped by the ruthless local infantry unit.\",\n    \"Language\": \"English, Burmese, Thai\",\n    \"Country\": \"Germany, United States\",\n    \"Awards\": \"1 win & 1 nomination\",\n    \"Poster\": \"https://m.media-amazon.com/images/M/MV5BMTI5Mjg1MzM4NF5BMl5BanBnXkFtZTcwNTAyNzUzMw@@._V1_SX300.jpg\",\n    \"Ratings\": [\n        {\n            \"Source\": \"Internet Movie Database\",\n            \"Value\": \"7.0/10\"\n        },\n        {\n            \"Source\": \"Rotten Tomatoes\",\n            \"Value\": \"37%\"\n        },\n        {\n            \"Source\": \"Metacritic\",\n            \"Value\": \"46/100\"\n        }\n    ],\n    \"Metascore\": \"46\",\n    \"imdbRating\": \"7.0\",\n    \"imdbVotes\": \"229,156\",\n    \"Type\": \"movie\",\n    \"DVD\": \"27 May 2008\",\n    \"BoxOffice\": \"$42,754,105\",\n    \"Production\": \"N/A\",\n    \"Website\": \"N/A\",\n    \"Response\": \"True\"\n}"
+						},
+						{
+							"name": "Unsucessful operation - no movie found by the omdb API corresponding to the given title",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/movie/title?title=asdasdas",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"movie",
+										"title"
+									],
+									"query": [
+										{
+											"key": "title",
+											"value": "asdasdas"
+										},
+										{
+											"key": "year",
+											"value": "2014",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 23:04:54 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-28T23:04:54.636+00:00\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"path\": \"/movie/title\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Movie By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/movie/id?movieId=tt0462499",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movie",
+								"id"
+							],
+							"query": [
+								{
+									"key": "movieId",
+									"value": "tt0462499"
+								}
+							]
+						},
+						"description": "Get movies details of the movie corresponding to the given movieId.\n\nProperty movieId must be a valid imdbId that can be obtained in the response of the Get Movie by Title or Get Movies requests."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/movie/id?movieId=tt0462499",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"movie",
+										"id"
+									],
+									"query": [
+										{
+											"key": "movieId",
+											"value": "tt0462499"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 23:02:52 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"imdbID\": \"tt0462499\",\n    \"Title\": \"Rambo\",\n    \"Year\": \"2008\",\n    \"Rated\": \"R\",\n    \"Released\": \"25 Jan 2008\",\n    \"Runtime\": \"92 min\",\n    \"Genre\": \"Action, Adventure, Thriller\",\n    \"Director\": \"Sylvester Stallone\",\n    \"Writer\": \"Art Monterastelli, Sylvester Stallone, David Morrell\",\n    \"Actors\": \"Sylvester Stallone, Julie Benz, Matthew Marsden\",\n    \"Plot\": \"In Thailand, John Rambo joins a group of mercenaries to venture into war-torn Burma, and rescue a group of Christian aid workers who were kidnapped by the ruthless local infantry unit.\",\n    \"Language\": \"English, Burmese, Thai\",\n    \"Country\": \"Germany, United States\",\n    \"Awards\": \"1 win & 1 nomination\",\n    \"Poster\": \"https://m.media-amazon.com/images/M/MV5BMTI5Mjg1MzM4NF5BMl5BanBnXkFtZTcwNTAyNzUzMw@@._V1_SX300.jpg\",\n    \"Ratings\": [\n        {\n            \"Source\": \"Internet Movie Database\",\n            \"Value\": \"7.0/10\"\n        },\n        {\n            \"Source\": \"Rotten Tomatoes\",\n            \"Value\": \"37%\"\n        },\n        {\n            \"Source\": \"Metacritic\",\n            \"Value\": \"46/100\"\n        }\n    ],\n    \"Metascore\": \"46\",\n    \"imdbRating\": \"7.0\",\n    \"imdbVotes\": \"229,156\",\n    \"Type\": \"movie\",\n    \"DVD\": \"27 May 2008\",\n    \"BoxOffice\": \"$42,754,105\",\n    \"Production\": \"N/A\",\n    \"Website\": \"N/A\",\n    \"Response\": \"True\"\n}"
+						},
+						{
+							"name": "Unsucessful operation - no movie found by the omdb API corresponding to the given movieId",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/movie/id?movieId=asdasdas",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"movie",
+										"id"
+									],
+									"query": [
+										{
+											"key": "movieId",
+											"value": "asdasdas"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 23:03:17 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-28T23:03:17.513+00:00\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"path\": \"/movie/id\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Search Movies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/movie/search?title=Rambo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movie",
+								"search"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "Rambo"
+								},
+								{
+									"key": "year",
+									"value": "2008",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Search a maximum of 10 Movies (with their commentaries and grades) that correspond to the given title and the given year, if provided.\n\nThe optional page query parameter can be used to get the next 10 Movies corresponding to the given search (page must be a positive integer)."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/movie/search?title=Rambo",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"movie",
+										"search"
+									],
+									"query": [
+										{
+											"key": "title",
+											"value": "Rambo"
+										},
+										{
+											"key": "year",
+											"value": "2008",
+											"disabled": true
+										},
+										{
+											"key": "page",
+											"value": "1",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 23:00:36 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"Search\": [\n        {\n            \"imdbID\": \"tt0462499\",\n            \"Title\": \"Rambo\",\n            \"Year\": \"2008\",\n            \"Type\": \"movie\",\n            \"Poster\": \"https://m.media-amazon.com/images/M/MV5BMTI5Mjg1MzM4NF5BMl5BanBnXkFtZTcwNTAyNzUzMw@@._V1_SX300.jpg\"\n        },\n        {\n            \"imdbID\": \"tt0089880\",\n            \"Title\": \"Rambo: First Blood Part II\",\n            \"Year\": \"1985\",\n            \"Type\": \"movie\",\n            \"Poster\": \"https://m.media-amazon.com/images/M/MV5BZWFkY2I1ZDAtNmZhNS00NjVlLWJiMGQtMGQ1ZmM0ZDA5ODg5XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg\"\n        },\n        {\n            \"imdbID\": \"tt0095956\",\n            \"Title\": \"Rambo III\",\n            \"Year\": \"1988\",\n            \"Type\": \"movie\",\n            \"Poster\": \"https://m.media-amazon.com/images/M/MV5BOTIwNWJhZDItZmNmOC00M2NkLWIwNDktMTYwZWFlZDVkMmVkL2ltYWdlXkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SX300.jpg\"\n        },\n        {\n            \"imdbID\": \"tt1206885\",\n            \"Title\": \"Rambo: Last Blood\",\n            \"Year\": \"2019\",\n            \"Type\": \"movie\",\n            \"Poster\": \"https://m.media-amazon.com/images/M/MV5BNTAxZWM2OTgtOTQzOC00ZTI5LTgyYjktZTRhYWM4YWQxNWI0XkEyXkFqcGdeQXVyMjMwNDgzNjc@._V1_SX300.jpg\"\n        },\n        {\n            \"imdbID\": \"tt0222619\",\n            \"Title\": \"Rambo\",\n            \"Year\": \"1986\",\n            \"Type\": \"series\",\n            \"Poster\": \"https://m.media-amazon.com/images/M/MV5BZDQ0M2M2MjktMmViYy00MDM5LWE1NWEtZmRhNzZmMGM3MzkxXkEyXkFqcGdeQXVyMjY3MjUzNDk@._V1_SX300.jpg\"\n        },\n        {\n            \"imdbID\": \"tt10951972\",\n            \"Title\": \"Arthur Rambo\",\n            \"Year\": \"2021\",\n            \"Type\": \"movie\",\n            \"Poster\": \"https://m.media-amazon.com/images/M/MV5BNzg5ZjJiNWEtNzhiZC00NzNhLThjZDgtZGU4OTMwN2I5YWY1XkEyXkFqcGdeQXVyNDgzNjg5Nw@@._V1_SX300.jpg\"\n        },\n        {\n            \"imdbID\": \"tt0301766\",\n            \"Title\": \"Rambo III\",\n            \"Year\": \"1989\",\n            \"Type\": \"game\",\n            \"Poster\": \"https://m.media-amazon.com/images/M/MV5BNDE3Y2NkODgtMzhmNi00M2M3LTgxMTAtNjBhNTJiOTdmZDIzXkEyXkFqcGdeQXVyMjY3MjUzNDk@._V1_SX300.jpg\"\n        },\n        {\n            \"imdbID\": \"tt0301768\",\n            \"Title\": \"Rambo: First Blood Part II\",\n            \"Year\": \"1986\",\n            \"Type\": \"game\",\n            \"Poster\": \"https://m.media-amazon.com/images/M/MV5BOWUzMDE1NTktMTU0OS00NTE3LWE2NzItMzA3MGM2NzdkYTJlXkEyXkFqcGdeQXVyMjY3MjUzNDk@._V1_SX300.jpg\"\n        },\n        {\n            \"imdbID\": \"tt3107798\",\n            \"Title\": \"Rambo\",\n            \"Year\": \"2012\",\n            \"Type\": \"movie\",\n            \"Poster\": \"https://m.media-amazon.com/images/M/MV5BNDUwOGYwYWUtZjMzNi00MDIwLWE2NjgtYTdhODJmMTQwMGMyXkEyXkFqcGdeQXVyMzQzMDc2MDk@._V1_SX300.jpg\"\n        },\n        {\n            \"imdbID\": \"tt0301765\",\n            \"Title\": \"Rambo\",\n            \"Year\": \"1987\",\n            \"Type\": \"game\",\n            \"Poster\": \"https://m.media-amazon.com/images/M/MV5BYmMxZGVjYzYtNWY4ZC00ZjAwLWFjNWQtOWFjNGEzNDQ2ZDM3XkEyXkFqcGdeQXVyMTgwOTE5NDk@._V1_SX300.jpg\"\n        }\n    ],\n    \"totalResults\": \"50\",\n    \"Response\": \"True\"\n}"
+						},
+						{
+							"name": "Unsucessful operation - no movies found by the omdb API corresponding to the given title",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/movie/search?title=asdadadasdas",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"movie",
+										"search"
+									],
+									"query": [
+										{
+											"key": "title",
+											"value": "asdadadasdas"
+										},
+										{
+											"key": "year",
+											"value": "2008",
+											"disabled": true
+										},
+										{
+											"key": "page",
+											"value": "1",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 23:01:24 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-28T23:01:24.913+00:00\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"path\": \"/movie/search\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Grades",
+			"item": [
+				{
+					"name": "Get Movie Grades",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/grade?movieId=tt0462499",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"grade"
+							],
+							"query": [
+								{
+									"key": "movieId",
+									"value": "tt0462499",
+									"description": "Obrigatory - It must be a valid imdbId of a movie that can be obtained in the response of the Get Movie By Title or Search Movies requests."
+								},
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Page number to receive starting at 0 for the first page",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"description": "Number of commentaries to receive in the page",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "id,asc",
+									"description": "The results can be sorted by id or userName. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. userName,desc).",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated registered grades for the movie corresponding to the given movieId.\n\nAll parameters except movieId are optional."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/grade?movieId=tt0462499",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"grade"
+									],
+									"query": [
+										{
+											"key": "movieId",
+											"value": "tt0462499",
+											"description": "Obrigatory - It must be a valid imdbId of a movie that can be obtained in the response of the Get Movie By Title or Search Movies requests."
+										},
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Page number to receive starting at 0 for the first page",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "20",
+											"description": "Number of commentaries to receive in the page",
+											"disabled": true
+										},
+										{
+											"key": "sort",
+											"value": "id,asc",
+											"description": "The results can be sorted by id or userName. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. userName,desc).",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:59:56 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"content\": [\n        {\n            \"id\": 1,\n            \"userName\": \"MODERADOR1\",\n            \"movieId\": \"tt0462499\",\n            \"grade\": 4.2\n        },\n        {\n            \"id\": 2,\n            \"userName\": \"MODERADOR1\",\n            \"movieId\": \"tt0462499\",\n            \"grade\": 5.6\n        },\n        {\n            \"id\": 3,\n            \"userName\": \"MODERADOR1\",\n            \"movieId\": \"tt0462499\",\n            \"grade\": 7.2\n        }\n    ],\n    \"pageable\": {\n        \"sort\": {\n            \"empty\": true,\n            \"sorted\": false,\n            \"unsorted\": true\n        },\n        \"offset\": 0,\n        \"pageNumber\": 0,\n        \"pageSize\": 20,\n        \"paged\": true,\n        \"unpaged\": false\n    },\n    \"last\": true,\n    \"totalPages\": 1,\n    \"totalElements\": 3,\n    \"size\": 20,\n    \"number\": 0,\n    \"sort\": {\n        \"empty\": true,\n        \"sorted\": false,\n        \"unsorted\": true\n    },\n    \"first\": true,\n    \"numberOfElements\": 3,\n    \"empty\": false\n}"
+						}
+					]
+				},
+				{
+					"name": "Register Movie Grade",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"movieId\": \"tt0462499\",\r\n    \"grade\": 4.2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/grade",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"grade"
+							]
+						},
+						"description": "Register a Movie Grade with the userName of the authorized user in this request given the movieId and the grade in the request body.\n\nProperty movieId must be a valid imdbId that can be obtained in the response of the Get Movie By Title or Get Movies requests.\n\nProperty grade must be decimal number maior ou igual a 0 e menor ou igual a 10."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"movieId\": \"tt0462499\",\r\n    \"grade\": 4.2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/grade",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"grade"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:58:20 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"userName\": \"MODERADOR1\",\n    \"movieId\": \"tt0462499\",\n    \"grade\": 4.2\n}"
+						},
+						{
+							"name": "Unsucessful operation - no movie found by the omdb API corresponding to the given movieId",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"movieId\": \"asdaad\",\r\n    \"grade\": 4.2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/grade",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"grade"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:58:41 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-28T22:58:41.880+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"path\": \"/grade\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Commentaries",
+			"item": [
+				{
+					"name": "Get Movie Commentaries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/commentary?movieId=tt0462499",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"commentary"
+							],
+							"query": [
+								{
+									"key": "movieId",
+									"value": "tt0462499",
+									"description": "Obrigatory - It must be a valid imdbId of a movie that can be obtained in the response of the Get Movie By Title or Search Movies requests."
+								},
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Page number to receive starting at 0 for the first page",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"description": "Number of commentaries to receive in the page",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "id,asc",
+									"description": "The results can be sorted by id, userName or text. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. text,desc).",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated registered commentaries for the movie corresponding to the given movieId.\n\nAll parameters except movieId are optional."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/commentary?movieId=tt0462499",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary"
+									],
+									"query": [
+										{
+											"key": "movieId",
+											"value": "tt0462499",
+											"description": "Obrigatory - It must be a valid imdbId of a movie that can be obtained in the response of the Get Movie By Title or Search Movies requests."
+										},
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Page number to receive",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "20",
+											"description": "Number of commentaries to recieve in the page",
+											"disabled": true
+										},
+										{
+											"key": "sort",
+											"value": "id,asc",
+											"description": "The results can be sorted by id, ",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 20:48:43 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"content\": [\n        {\n            \"id\": 1,\n            \"userName\": \"MODERADOR1\",\n            \"movieId\": \"tt0462499\",\n            \"text\": \"Commentary text\"\n        },\n        {\n            \"id\": 2,\n            \"userName\": \"BÁSICO1\",\n            \"movieId\": \"tt0462499\",\n            \"text\": \"Commentary text2\"\n        }\n    ],\n    \"pageable\": {\n        \"sort\": {\n            \"empty\": true,\n            \"sorted\": false,\n            \"unsorted\": true\n        },\n        \"offset\": 0,\n        \"pageNumber\": 0,\n        \"pageSize\": 20,\n        \"paged\": true,\n        \"unpaged\": false\n    },\n    \"last\": true,\n    \"totalPages\": 1,\n    \"totalElements\": 2,\n    \"size\": 20,\n    \"number\": 0,\n    \"sort\": {\n        \"empty\": true,\n        \"sorted\": false,\n        \"unsorted\": true\n    },\n    \"first\": true,\n    \"numberOfElements\": 2,\n    \"empty\": false\n}"
+						}
+					]
+				},
+				{
+					"name": "Register Movie Commentary",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"movieId\": \"tt0462499\",\n    \"text\": \"Commentary text\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/commentary",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"commentary"
+							]
+						},
+						"description": "Register a Movie Commentary with the userName of the authorized user in this request given the movieId and the commentary text in the request body.\n\nThe authorized user must have the Authority \"BÁSICO\" in order to register a commentary.\n\nProperty movieId must be a valid imdbId that can be obtained in the response of the Get Movie By Title or Search Movies requests.\n\nProperty text must be provided and must not be an empty string."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"movieId\": \"tt0462499\",\n    \"text\": \"Commentary text\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/commentary",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 20:59:17 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 3,\n    \"userName\": \"MODERADOR1\",\n    \"movieId\": \"tt0462499\",\n    \"text\": \"Commentary text\"\n}"
+						},
+						{
+							"name": "Unsucessful operation - no movie found by the omdb API corresponding to the given movieId",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"movieId\": \"asdadas\",\n    \"text\": \"Commentary text\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/commentary",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:56:08 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-28T22:56:08.894+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"path\": \"/commentary\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Movie Commentary",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/commentary?commentaryId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"commentary"
+							],
+							"query": [
+								{
+									"key": "commentaryId",
+									"value": "1",
+									"description": "Obrigatory - The id of the commentary to be deleted"
+								}
+							]
+						},
+						"description": "Delete the commentary corresponding to the given commentaryId. All commentary replies and grades associated with the deleted commentary are also deleted.\n\nThe authorized user must have the Authority \"MODERADOR\" in order to make this request."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/commentary?commentaryId=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary"
+									],
+									"query": [
+										{
+											"key": "commentaryId",
+											"value": "1",
+											"description": "Obrigatory - The id of the commentary to be deleted"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 29 Jun 2022 05:56:41 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"userName\": \"MODERADOR1\",\n    \"movieId\": \"tt0462499\",\n    \"text\": \"Commentary text\"\n}"
+						},
+						{
+							"name": "Unsuccessful operation - no commentary with provided commentaryId was found",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/commentary?commentaryId=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary"
+									],
+									"query": [
+										{
+											"key": "commentaryId",
+											"value": "1",
+											"description": "Obrigatory - The id of the commentary to be deleted"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 29 Jun 2022 05:51:07 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-29T05:51:07.761+00:00\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"path\": \"/commentary\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Commentary Replies",
+			"item": [
+				{
+					"name": "Get Commentary Replies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/commentary/reply?commentaryId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"commentary",
+								"reply"
+							],
+							"query": [
+								{
+									"key": "commentaryId",
+									"value": "1",
+									"description": "Obrigatory - It must be an id of commentary registered in the database"
+								},
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Page number to receive starting at 0 for the first page",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"description": "Number of commentary replies to receive in the page",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "id,asc",
+									"description": "The results can be sorted by id, userName or text. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. text,desc).",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated registered commentary replies for the commentary corresponding to the given commentaryId.\n\nAll parameters except commentaryId are optional."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/commentary/reply?commentaryId=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary",
+										"reply"
+									],
+									"query": [
+										{
+											"key": "commentaryId",
+											"value": "1",
+											"description": "Obrigatory - It must be an id of commentary registered in the database"
+										},
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Page number to receive starting at 0 for the first page",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "20",
+											"description": "Number of commentary replies to receive in the page",
+											"disabled": true
+										},
+										{
+											"key": "sort",
+											"value": "id,asc",
+											"description": "The results can be sorted by id, userName or text. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. text,desc).",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:30:09 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"content\": [\n        {\n            \"id\": 1,\n            \"userName\": \"MODERADOR1\",\n            \"text\": \"Commentary reply text\",\n            \"commentaryId\": 1\n        },\n        {\n            \"id\": 2,\n            \"userName\": \"MODERADOR1\",\n            \"text\": \"Commentary reply text\",\n            \"commentaryId\": 1\n        }\n    ],\n    \"pageable\": {\n        \"sort\": {\n            \"empty\": true,\n            \"sorted\": false,\n            \"unsorted\": true\n        },\n        \"offset\": 0,\n        \"pageNumber\": 0,\n        \"pageSize\": 20,\n        \"paged\": true,\n        \"unpaged\": false\n    },\n    \"last\": true,\n    \"totalPages\": 1,\n    \"totalElements\": 2,\n    \"size\": 20,\n    \"number\": 0,\n    \"sort\": {\n        \"empty\": true,\n        \"sorted\": false,\n        \"unsorted\": true\n    },\n    \"first\": true,\n    \"numberOfElements\": 2,\n    \"empty\": false\n}"
+						},
+						{
+							"name": "Unsuccessful operation - no registered commentary with given commentaryId",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/commentary/reply?commentaryId=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary",
+										"reply"
+									],
+									"query": [
+										{
+											"key": "commentaryId",
+											"value": "1",
+											"description": "Obrigatory - It must be an id of commentary registered in the database"
+										},
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Page number to receive starting at 0 for the first page",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "20",
+											"description": "Number of commentary replies to receive in the page",
+											"disabled": true
+										},
+										{
+											"key": "sort",
+											"value": "id,asc",
+											"description": "The results can be sorted by id, userName or text. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. text,desc).",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 21:59:08 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-28T21:59:08.590+00:00\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"path\": \"/commentary/reply\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Register Commentary Reply",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"commentaryId\": 1,\n    \"text\": \"Commentary reply text\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/commentary/reply",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"commentary",
+								"reply"
+							]
+						},
+						"description": "Register a commentary Reply with the userName of the authorized user in this request given the commentaryId and the reply text in the request body.\n\nThe authorized user must have the Authority \"BÁSICO\" in order to register a commentary.\n\nProperty commentaryId must be a valid id of commentary registered in the system that can be obtained in the response of the Get Movie By Title or Search Movies requests in the property commentaries.\n\nProperty text must be provided and must not be an empty string."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"commentaryId\": 1,\n    \"text\": \"Commentary reply text\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/commentary/reply",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary",
+										"reply"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:55:03 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"userName\": \"MODERADOR1\",\n    \"text\": \"Commentary reply text\",\n    \"commentaryId\": 1\n}"
+						},
+						{
+							"name": "Unsuccessful operation - no registered commentary with given commentaryId",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"commentaryId\": 2,\n    \"text\": \"Commentary reply text\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/commentary/reply",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary",
+										"reply"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:55:26 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-28T22:55:26.081+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"path\": \"/commentary/reply\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Commentary Evaluations",
+			"item": [
+				{
+					"name": "Get Commentary Evaluations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/commentary/evaluation?commentaryId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"commentary",
+								"evaluation"
+							],
+							"query": [
+								{
+									"key": "commentaryId",
+									"value": "1",
+									"description": "Obrigatory - It must be an id of commentary registered in the database"
+								},
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Page number to receive starting at 0 for the first page",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"description": "Number of commentary evaluations to receive in the page",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "id,asc",
+									"description": "The results can be sorted by id, userName or liked. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. userName,desc).",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated registered commentary evaluations for the commentary corresponding to the given commentaryId.\n\nAll parameters except commentaryId are optional."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/commentary/evaluation?commentaryId=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary",
+										"evaluation"
+									],
+									"query": [
+										{
+											"key": "commentaryId",
+											"value": "1",
+											"description": "Obrigatory - It must be an id of commentary registered in the database"
+										},
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Page number to receive starting at 0 for the first page",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "20",
+											"description": "Number of commentary evaluations to receive in the page",
+											"disabled": true
+										},
+										{
+											"key": "sort",
+											"value": "id,asc",
+											"description": "The results can be sorted by id, userName or liked. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. userName,desc).",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:52:45 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"content\": [\n        {\n            \"id\": 1,\n            \"userName\": \"MODERADOR1\",\n            \"liked\": true,\n            \"commentaryId\": 1\n        },\n        {\n            \"id\": 2,\n            \"userName\": \"MODERADOR1\",\n            \"liked\": false,\n            \"commentaryId\": 1\n        }\n    ],\n    \"pageable\": {\n        \"sort\": {\n            \"empty\": true,\n            \"sorted\": false,\n            \"unsorted\": true\n        },\n        \"offset\": 0,\n        \"pageNumber\": 0,\n        \"pageSize\": 20,\n        \"paged\": true,\n        \"unpaged\": false\n    },\n    \"last\": true,\n    \"totalPages\": 1,\n    \"totalElements\": 2,\n    \"size\": 20,\n    \"number\": 0,\n    \"sort\": {\n        \"empty\": true,\n        \"sorted\": false,\n        \"unsorted\": true\n    },\n    \"first\": true,\n    \"numberOfElements\": 2,\n    \"empty\": false\n}"
+						},
+						{
+							"name": "Unsuccessful operation - no registered commentary with given commentaryId",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/commentary/evaluation?commentaryId=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary",
+										"evaluation"
+									],
+									"query": [
+										{
+											"key": "commentaryId",
+											"value": "1",
+											"description": "Obrigatory - It must be an id of commentary registered in the database"
+										},
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Page number to receive starting at 0 for the first page",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "20",
+											"description": "Number of commentary evaluations to receive in the page",
+											"disabled": true
+										},
+										{
+											"key": "sort",
+											"value": "id,asc",
+											"description": "The results can be sorted by id, userName or liked. The default is to sort in ascending order but it can be sorted in descending order by providing the parameter followed by a comma and desc keyword (eg. userName,desc).",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:51:06 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-28T22:51:06.563+00:00\",\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"path\": \"/commentary/evaluation\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Register Commentary Evaluation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"commentaryId\": 1,\n    \"liked\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/commentary/evaluation",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"commentary",
+								"evaluation"
+							]
+						},
+						"description": "Register a commentary Evaluation with the userName of the authorized user in this request given the commentaryId and the boolean liked in the request body.\n\nThe authorized user must have the Authority \"AVANÇADO\" in order to register a commentary Evaluation.\n\nProperty commentaryId must be a valid id of a registered commentary in the system that can be obtained in the response of the Get Movie By Title, Get Movie By Id or Search Movies requests in the property commentaries.\n\nProperty liked must be provided and must be a boolean (true or false)."
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"commentaryId\": 1,\n    \"liked\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/commentary/evaluation",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary",
+										"evaluation"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:53:16 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 3,\n    \"userName\": \"MODERADOR1\",\n    \"liked\": true,\n    \"commentaryId\": 1\n}"
+						},
+						{
+							"name": "Unsuccessful operation - no registered commentary with given commentaryId",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"commentaryId\": 2,\n    \"liked\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/commentary/evaluation",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"commentary",
+										"evaluation"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 28 Jun 2022 22:53:37 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2022-06-28T22:53:37.603+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"path\": \"/commentary/evaluation\"\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "localhost:8382",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "null",
+			"type": "string"
+		}
+	]
+}

@@ -3,10 +3,10 @@ package com.company.usersapi.service;
 import com.company.usersapi.config.JwtTokenUtil;
 import com.company.usersapi.dto.*;
 import com.company.usersapi.model.Authority;
-import com.company.usersapi.model.PageData;
 import com.company.usersapi.model.User;
 import com.company.usersapi.repository.AuthorityRepository;
 import com.company.usersapi.repository.UserRepository;
+import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCachePut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +27,7 @@ public class GatewayService {
     private final WebClient reviewsApiClient;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final AuthorityRepository authorityRepository;
 
     public Mono<MovieDTO> getMovieByTitle(String title, String year) {
@@ -74,7 +75,7 @@ public class GatewayService {
                 });
     }
 
-    public Mono<PageData<GradeDTO>> getMovieGrades(String movieId, Pageable pageable) {
+    public Mono<RestPage<GradeDTO>> getMovieGrades(String movieId, Pageable pageable) {
         return reviewsApiClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -85,7 +86,10 @@ public class GatewayService {
                         .queryParam("sort", this.getSortParametersArray(pageable))
                         .build())
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {});
+                .bodyToMono(new ParameterizedTypeReference<RestPage<GradeDTO>>() {})
+                .onErrorMap(err -> {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid query parameters");
+                });
     }
 
     public Mono<GradeDTO> registerMovieGrade(String accessToken, GradeDTO gradeDTO) {
@@ -107,7 +111,7 @@ public class GatewayService {
                 });
     }
 
-    public Mono<PageData<CommentaryDTO>> getMovieCommentaries(String movieId, Pageable pageable) {
+    public Mono<RestPage<CommentaryDTO>> getMovieCommentaries(String movieId, Pageable pageable) {
         return reviewsApiClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -118,7 +122,10 @@ public class GatewayService {
                         .queryParam("sort", this.getSortParametersArray(pageable))
                         .build())
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {});
+                .bodyToMono(new ParameterizedTypeReference<RestPage<CommentaryDTO>>() {})
+                .onErrorMap(err -> {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid query parameters");
+                });
     }
 
     public Mono<CommentaryDTO> registerMovieCommentary(String accessToken, CommentaryDTO commentaryDTO) {
@@ -154,7 +161,7 @@ public class GatewayService {
                 });
     }
 
-    public Mono<PageData<CommentaryReplyDTO>> getCommentaryReplies(Long commentaryId, Pageable pageable) {
+    public Mono<RestPage<CommentaryReplyDTO>> getCommentaryReplies(Long commentaryId, Pageable pageable) {
         return reviewsApiClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -165,13 +172,13 @@ public class GatewayService {
                         .queryParam("sort", this.getSortParametersArray(pageable))
                         .build())
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<PageData<CommentaryReplyDTO>>() {})
+                .bodyToMono(new ParameterizedTypeReference<RestPage<CommentaryReplyDTO>>() {})
                 .onErrorMap(err -> {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Commentary with provided commentaryId was not found");
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid query parameter");
                 })
-                .map(commentaryReplyDTOPageData -> {
-                    commentaryReplyDTOPageData.content.forEach(commentaryReplyDTO -> commentaryReplyDTO.setCommentaryId(commentaryId));
-                    return commentaryReplyDTOPageData;
+                .map(commentaryReplyPage -> {
+                    commentaryReplyPage.getContent().forEach(commentaryReplyDTO -> commentaryReplyDTO.setCommentaryId(commentaryId));
+                    return commentaryReplyPage;
                 });
     }
 
@@ -195,7 +202,7 @@ public class GatewayService {
                 });
     }
 
-    public Mono<PageData<CommentaryEvaluationDTO>> getCommentaryEvaluations(Long commentaryId, Pageable pageable) {
+    public Mono<RestPage<CommentaryEvaluationDTO>> getCommentaryEvaluations(Long commentaryId, Pageable pageable) {
         return reviewsApiClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -206,13 +213,13 @@ public class GatewayService {
                         .queryParam("sort", this.getSortParametersArray(pageable))
                         .build())
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<PageData<CommentaryEvaluationDTO>>() {})
+                .bodyToMono(new ParameterizedTypeReference<RestPage<CommentaryEvaluationDTO>>() {})
                 .onErrorMap(err -> {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Commentary with commentaryId was not found");
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid query parameters");
                 })
-                .map(commentaryEvaluationDTOPageData -> {
-                    commentaryEvaluationDTOPageData.content.forEach(commentaryEvaluationDTO -> commentaryEvaluationDTO.setCommentaryId(commentaryId));
-                    return commentaryEvaluationDTOPageData;
+                .map(commentaryEvaluationPage -> {
+                    commentaryEvaluationPage.getContent().forEach(commentaryEvaluationDTO -> commentaryEvaluationDTO.setCommentaryId(commentaryId));
+                    return commentaryEvaluationPage;
                 });
     }
 
@@ -240,11 +247,12 @@ public class GatewayService {
         return sorts.toArray();
     }
 
-    private void giveUserOnePoint(String userName) {
-        User user = userRepository.findOneByUserName(userName);
+    @ReactiveRedisCachePut(cacheName = "userByUserName", key = "#userName", timeout = 1800)
+    private User giveUserOnePoint(String userName) {
+        User user = this.userService.getUserByUserName(userName);
         user.setPoints(user.getPoints() + 1);
         this.updateUserAuthorities(user);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     private void updateUserAuthorities(User user) {

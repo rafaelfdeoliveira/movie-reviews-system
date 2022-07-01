@@ -1,17 +1,5 @@
 version: "3"
 services:
-  postgresDB:
-    image: postgres
-    restart: always
-    networks:
-      - movie-reviews-api
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=movie-reviews-system
-    volumes:
-      - database:/postgres
-
   reviews-api:
     image: reviews-api
     build:
@@ -20,8 +8,10 @@ services:
       - movie-reviews-api
     depends_on:
       - postgresDB
+      - redis
     environment:
       - spring.datasource.url=jdbc:postgresql://postgresDB:5432/movie-reviews-system
+      - spring.redis.host=redis
     volumes:
       - database:/reviews-api
 
@@ -36,11 +26,33 @@ services:
     depends_on:
       - reviews-api
       - postgresDB
+      - redis
     environment:
       - spring.datasource.url=jdbc:postgresql://postgresDB:5432/movie-reviews-system
       - reviewsApiUrl=http://reviews-api:8384
+      - spring.redis.host=redis
     volumes:
       - database:/users-api
+
+  postgresDB:
+    image: postgres
+    restart: always
+    networks:
+      - movie-reviews-api
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=movie-reviews-system
+    volumes:
+      - database:/postgres
+
+  redis:
+    image: redis
+    restart: always
+    networks:
+      - movie-reviews-api
+    volumes:
+      - database:/redis
 
 networks:
   movie-reviews-api:

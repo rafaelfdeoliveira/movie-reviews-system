@@ -1,11 +1,13 @@
 package com.company.usersapi.service;
 
 import com.company.usersapi.config.JwtTokenUtil;
+import com.company.usersapi.dto.RestPage;
 import com.company.usersapi.dto.UserDTO;
-import com.company.usersapi.dto.UserDTOPageData;
 import com.company.usersapi.model.*;
 import com.company.usersapi.repository.AuthorityRepository;
 import com.company.usersapi.repository.UserRepository;
+import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCacheEvict;
+import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCacheable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class UserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
 
+    @ReactiveRedisCacheEvict(cacheName = "userByUserName", key = "#userDTO.userName")
     public Mono<UserDTO> createUser(UserDTO userDTO) {
         return Mono.just(userDTO)
                 .publishOn(Schedulers.boundedElastic())
@@ -52,10 +56,13 @@ public class UserService {
                 .map(this::getLoggedUser);
     }
 
-    public Mono<UserDTOPageData> fetchAllUsers(Pageable pageable) {
+    public Mono<RestPage<UserDTO>> fetchAllUsers(Pageable pageable) {
         return Mono.just(pageable)
                 .publishOn(Schedulers.boundedElastic())
-                .map(this::getAllUsers);
+                .map(this::getAllUsers)
+                .onErrorMap(err -> {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid query parameters");
+                });
     }
 
     public Mono<UserDTO> fetchUserByUserName(String userName) {
@@ -64,14 +71,20 @@ public class UserService {
                 .map(this::getUserDTOByUserName);
     }
 
+    @ReactiveRedisCacheEvict(cacheName = "userByUserName", key = "#userName")
     public Mono<UserDTO> makeUserAdmin(String userName) {
         return Mono.just(userName)
                 .publishOn(Schedulers.boundedElastic())
                 .map(this::giveUserAdminAuthority);
     }
 
+    @ReactiveRedisCacheable(cacheName = "userByUserName", key = "#userName", timeout = 1800)
+    protected User getUserByUserName(String userName) {
+        return userRepository.findById(userName).orElse(null);
+    }
+
     private UserDTO saveUser(UserDTO userDTO) {
-        User userWithSameUserName = userRepository.findById(userDTO.getUserName()).orElse(null);
+        User userWithSameUserName = this.getUserByUserName(userDTO.getUserName());
         if (userWithSameUserName != null) throw new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "UserName already exists");
         if (userDTO.getPassword() == null) throw new ResponseStatusException(HttpStatus.PARTIAL_CONTENT, "A password must be provided");
 
@@ -95,8 +108,8 @@ public class UserService {
 
     private UserDTO getLoggedUser(String accessToken) {
         String userName = jwtTokenUtil.getUsernameFromToken(accessToken.substring(7));
-        User user = userRepository.findById(userName).orElse(null);
-        if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "LOGGED USER NOT FOUND");
+        User user = this.getUserByUserName(userName);
+        if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "LOOGED USER NOT FOUND");
         return UserDTO.convert(user);
     }
 
@@ -104,24 +117,31 @@ public class UserService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "USER_DISABLED");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "USER DISABLED");
         } catch (BadCredentialsException e) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "INVALID_CREDENTIALS");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "INVALID CREDENTIALS");
         }
     }
 
-    private UserDTOPageData getAllUsers(Pageable pageable) {
+    private RestPage<UserDTO> getAllUsers(Pageable pageable) {
         Page<User> usersPage = userRepository.findAll(pageable);
-        return UserDTOPageData.convertUsersPageToUserDTOPageData(usersPage);
+        return new RestPage<>(
+                usersPage.getContent().stream().map(UserDTO::convert).collect(Collectors.toList()),
+                usersPage.getNumber(),
+                usersPage.getSize(),
+                usersPage.getTotalElements()
+        );
     }
 
     private UserDTO getUserDTOByUserName(String userName) {
         User user = this.getUserByUserName(userName);
+        if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with the provided userName was found.");
         return UserDTO.convert(user);
     }
 
     private UserDTO giveUserAdminAuthority(String userName) {
         User user = this.getUserByUserName(userName);
+        if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with the provided userName was found.");
         List<String> currentUserRoles = user.getRoles();
         List.of("BÁSICO", "AVANÇADO", "MODERADOR").forEach(authorityName -> {
             if (currentUserRoles.contains(authorityName)) return;
@@ -134,11 +154,5 @@ public class UserService {
         UserDTO userDTO = UserDTO.convert(user);
         userDTO.setRoles(List.of("LEITOR", "BÁSICO", "AVANÇADO", "MODERADOR"));
         return userDTO;
-    }
-
-    private User getUserByUserName(String userName) {
-        User user = userRepository.findById(userName).orElse(null);
-        if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with the provided userName was found.");
-        return user;
     }
 }

@@ -2,6 +2,7 @@ package com.company.usersapi.service;
 
 import com.company.usersapi.model.User;
 import com.company.usersapi.repository.UserRepository;
+import com.hanqunfeng.reactive.redis.cache.aop.ReactiveRedisCacheable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,9 +17,14 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        User user = userRepository.findById(userName).orElse(null);
+        User user = this.getUserByUserName(userName);
         if (user == null) throw new UsernameNotFoundException("User not found with userName: " + userName);
 
         return new org.springframework.security.core.userdetails.User(userName, user.getPassword(), user.getAuthorities());
+    }
+
+    @ReactiveRedisCacheable(cacheName = "userByUserName", key = "#userName", timeout = 1800)
+    protected User getUserByUserName(String userName) {
+        return userRepository.findById(userName).orElse(null);
     }
 }

@@ -1,9 +1,9 @@
 package com.company.usersapi.controller;
 
+import com.company.usersapi.dto.RestPage;
 import com.company.usersapi.dto.UserDTO;
 import com.company.usersapi.model.JwtRequest;
 import com.company.usersapi.model.JwtResponse;
-import com.company.usersapi.dto.UserDTOPageData;
 import com.company.usersapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/user/all")
-    public Mono<UserDTOPageData> fetchAllUsers(Pageable pageable) {
+    public Mono<RestPage<UserDTO>> fetchAllUsers(Pageable pageable) {
         return userService.fetchAllUsers(pageable);
     }
 

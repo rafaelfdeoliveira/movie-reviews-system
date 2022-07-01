@@ -3,7 +3,6 @@ package com.company.usersapi.model;
 import com.company.usersapi.dto.UserDTO;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.jpa.repository.EntityGraph;
 
 import javax.persistence.*;
 import java.util.ArrayList;
